@@ -1,0 +1,17 @@
+@UrlShortener_HostAddress = http://localhost:5242
+
+###
+GET {{UrlShortener_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+GET {{UrlShortener_HostAddress}}/weatherforecast/shorten?url=http://www
+Accept: application/json
+
+### 200
+GET {{UrlShortener_HostAddress}}/weatherforecast/getlong?shortUrl=31DCD6B9
+Accept: application/json
+
+### 404
+GET {{UrlShortener_HostAddress}}/weatherforecast/getlong?shortUrl=31DCD6B91
+Accept: application/json
