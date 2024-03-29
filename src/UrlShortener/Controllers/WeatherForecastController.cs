@@ -41,12 +41,12 @@ namespace UrlShortener.Controllers
                 return BadRequest();
             }
 
-            var guid = Guid.NewGuid().GetHashCode().ToString("X");
+            var shortUrl = Guid.NewGuid().GetHashCode().ToString("X");
 
-            var grain = _grainFactory.GetGrain<IUrlShortenerGrain>(guid);
+            var grain = _grainFactory.GetGrain<IUrlShortenerGrain>(shortUrl);
             await grain.SetUrl(url);
 
-            return Ok(guid);
+            return Ok(shortUrl);
         }
 
         [HttpGet("getlong")]

@@ -12,6 +12,7 @@ builder.Host.UseOrleans(siloBuilder =>
             options.ConfigurationOptions =
                 ConfigurationOptions.Parse("10.99.59.47:7000,DefaultDatabase=6,allowAdmin=true");
         });
+    siloBuilder.UseDashboard(options => { });
 });
 
 // Add services to the container.
