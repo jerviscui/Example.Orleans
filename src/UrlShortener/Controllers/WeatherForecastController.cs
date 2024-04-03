@@ -67,5 +67,31 @@ namespace UrlShortener.Controllers
 
             return Ok(url);
         }
+
+        [HttpGet("GrainGet")]
+        public async Task<IActionResult> GrainGet(string shortUrl)
+        {
+            var grain = _grainFactory.GetGrain<IUrlGrain>(shortUrl);
+
+            var url = await grain.GetUrl();
+            if (string.IsNullOrEmpty(url))
+            {
+                return NotFound();
+            }
+
+            return Ok(url);
+        }
+
+        [HttpPost("GrainSet")]
+        public async Task<IActionResult> GrainSet()
+        {
+            var shortUrl = Guid.NewGuid().GetHashCode().ToString("X");
+
+            var grain = _grainFactory.GetGrain<IUrlGrain>(shortUrl);
+
+            await grain.SetUrl(shortUrl);
+
+            return Ok();
+        }
     }
 }
