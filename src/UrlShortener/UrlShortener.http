@@ -15,3 +15,11 @@ Accept: application/json
 ### 404
 GET {{UrlShortener_HostAddress}}/weatherforecast/getlong?shortUrl=31DCD6B91
 Accept: application/json
+
+### 
+GET {{UrlShortener_HostAddress}}/weatherforecast/GrainGet?shortUrl=31DCD6B91
+Accept: application/json
+
+### 
+POST {{UrlShortener_HostAddress}}/weatherforecast/GrainSet
+Accept: application/json

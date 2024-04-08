@@ -11,6 +11,8 @@
     <PackageReference Include="Microsoft.Orleans.GrainDirectory.Redis" Version="8.0.0" />
     <PackageReference Include="Microsoft.Orleans.Persistence.Redis" Version="8.0.0" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="8.0.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.8.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.8.0" />
     <PackageReference Include="OrleansDashboard" Version="8.0.0" />
     <PackageReference Include="ResultCore.J" Version="0.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

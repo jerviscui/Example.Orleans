@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
 using Orleans.Configuration;
 using StackExchange.Redis;
 using UrlShortener;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var redisConfig = ConfigurationOptions.Parse("10.99.59.47:7000,DefaultDatabase=6,allowAdmin=true");
+var redisConfig = ConfigurationOptions.Parse("127.0.0.1:6379,DefaultDatabase=6,allowAdmin=true");
 
 builder.Host.UseOrleans(siloBuilder =>
 {
@@ -30,9 +29,10 @@ builder.Host.UseOrleans(siloBuilder =>
         options => { options.ConfigurationOptions = redisConfig; });
 });
 
-builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
+builder.Services.AddOpenTelemetry().WithTracing(providerBuilder => { });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
