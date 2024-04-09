@@ -1,4 +1,4 @@
-@UrlShortener_HostAddress = http://localhost:5242
+@UrlShortener_HostAddress = https://localhost:7039
 
 ###
 GET {{UrlShortener_HostAddress}}/weatherforecast/
