@@ -1,3 +1,4 @@
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Orleans.Configuration;
@@ -20,6 +21,7 @@ builder.Host.UseOrleans(siloBuilder =>
             options.CreateMultiplexer = _ => GetRedisConnection();
         });
 
+    //http://localhost:8080/
     //siloBuilder.UseDashboard(options =>
     //{
     //    options.CounterUpdateIntervalMs = 5_000;
@@ -53,7 +55,9 @@ builder.Services.AddOpenTelemetry().WithTracing(providerBuilder =>
     providerBuilder.AddSource("Microsoft.Orleans.Runtime");
     providerBuilder.AddSource("Microsoft.Orleans.Application");
 
-    providerBuilder.AddZipkinExporter(options => { options.Endpoint = new Uri("http://localhost:9411/api/v2/spans"); });
+    //providerBuilder.AddZipkinExporter(options => { options.Endpoint = new Uri("http://localhost:9411/api/v2/spans"); });
+    //providerBuilder.AddOtlpExporter(options => { options.Endpoint = new Uri("http://localhost:4317"); }); // grpc
+    providerBuilder.AddOtlpExporter(options => { options.Protocol = OtlpExportProtocol.HttpProtobuf; }); // http
 });
 
 builder.Services.AddSingleton(connection);
