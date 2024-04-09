@@ -7,11 +7,18 @@ using UrlShortener;
 var builder = WebApplication.CreateBuilder(args);
 
 var redisConfig = ConfigurationOptions.Parse("127.0.0.1:6379,DefaultDatabase=6,allowAdmin=true");
+IConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfig);
+
+Task<IConnectionMultiplexer> GetRedisConnection() => Task.FromResult(connection);
 
 builder.Host.UseOrleans(siloBuilder =>
 {
     siloBuilder.AddRedisGrainStorage(UrlShortenerGrain.Storage,
-        options => { options.ConfigurationOptions = redisConfig; });
+        options =>
+        {
+            options.ConfigurationOptions = redisConfig;
+            options.CreateMultiplexer = _ => GetRedisConnection();
+        });
 
     //siloBuilder.UseDashboard(options =>
     //{
@@ -38,11 +45,18 @@ builder.Services.AddOpenTelemetry().WithTracing(providerBuilder =>
 {
     providerBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("UrlShortener", "1.0.0"));
 
+    providerBuilder.SetSampler(new AlwaysOnSampler());
+
     providerBuilder.AddAspNetCoreInstrumentation();
-    providerBuilder.AddSource("Microsoft.Orleans");
+    providerBuilder.AddRedisInstrumentation();
+    //orleans
+    providerBuilder.AddSource("Microsoft.Orleans.Runtime");
+    providerBuilder.AddSource("Microsoft.Orleans.Application");
 
     providerBuilder.AddZipkinExporter(options => { options.Endpoint = new Uri("http://localhost:9411/api/v2/spans"); });
 });
+
+builder.Services.AddSingleton(connection);
 
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
