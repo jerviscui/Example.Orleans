@@ -25,7 +25,7 @@ namespace UrlShortener.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get([FromServices] IConnectionMultiplexer connection)
         {
-            var value = connection.GetDatabase().StringGetSet("test", "value");
+            //var value = connection.GetDatabase().StringGetSet("test", "value");
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
                 {

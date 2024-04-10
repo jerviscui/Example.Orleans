@@ -56,8 +56,14 @@ builder.Services.AddOpenTelemetry().WithTracing(providerBuilder =>
     providerBuilder.AddSource("Microsoft.Orleans.Application");
 
     //providerBuilder.AddZipkinExporter(options => { options.Endpoint = new Uri("http://localhost:9411/api/v2/spans"); });
-    //providerBuilder.AddOtlpExporter(options => { options.Endpoint = new Uri("http://localhost:4317"); }); // grpc
-    providerBuilder.AddOtlpExporter(options => { options.Protocol = OtlpExportProtocol.HttpProtobuf; }); // http
+    // grpc
+    providerBuilder.AddOtlpExporter(options =>
+    {
+        options.Protocol = OtlpExportProtocol.Grpc;
+        options.Endpoint = new Uri("http://localhost:4317");
+    });
+    // http
+    //providerBuilder.AddOtlpExporter(options => { options.Protocol = OtlpExportProtocol.HttpProtobuf; });
 });
 
 builder.Services.AddSingleton(connection);
@@ -71,15 +77,15 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
-app.UseAuthorization();
+    app.UseAuthorization();
 
 app.MapControllers();
 
