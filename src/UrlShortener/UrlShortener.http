@@ -9,7 +9,7 @@ GET {{UrlShortener_HostAddress}}/weatherforecast/shorten?url=http://www
 Accept: application/json
 
 ### 200
-GET {{UrlShortener_HostAddress}}/weatherforecast/getlong?shortUrl=31DCD6B9
+GET {{UrlShortener_HostAddress}}/weatherforecast/getlong?shortUrl=D574D97B
 Accept: application/json
 
 ### 404
