@@ -67,16 +67,8 @@ let main args =
                     options.SiloListeningEndpoint <- IPEndPoint(IPAddress.Any, siloPort)
                     options.GatewayListeningEndpoint <- IPEndPoint(IPAddress.Any, gatewayPort))
                 .UseDashboard(fun (options: DashboardOptions) ->
-                    options.Username <- "piotr"
-                    options.Password <- "orleans"
+                    options.CounterUpdateIntervalMs <- 10_000
                     options.Port <- dashboardPort)
-                .UseLinuxEnvironmentStatistics()
-                .ConfigureApplicationParts(fun applicationPartManager ->
-                    applicationPartManager
-                        .AddApplicationPart(Assembly.GetAssembly(typeof<IDummyTests>))
-                        .WithReferences()
-                        .WithCodeGeneration()
-                    |> ignore)
                 .ConfigureLogging(configureLogging)
             |> ignore
 

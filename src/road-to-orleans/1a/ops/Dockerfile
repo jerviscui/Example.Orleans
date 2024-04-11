@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine as build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine as build
 
 COPY ./SiloHost/SiloHost.fsproj /src/SiloHost/SiloHost.fsproj
 COPY ./SiloHost/src/* /src/SiloHost/src/
@@ -13,7 +13,7 @@ RUN dotnet publish --verbosity normal "/src/SiloHost/SiloHost.fsproj" --configur
 EXPOSE 8080
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
 WORKDIR /SiloHost
 COPY --from=build /SiloHost ./

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine as build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine as build
 
 COPY ./Client/Client.csproj /src/Client/Client.csproj
 COPY ./Client/src/* /src/Client/
