@@ -6,8 +6,6 @@ COPY ./ops/entrypoint.sh /SiloHost/
 
 RUN dotnet publish --verbosity normal "/src/SiloHost.csproj" --configuration Release --output /SiloHost
 
-EXPOSE 8080
-
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 

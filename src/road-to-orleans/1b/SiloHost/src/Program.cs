@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Orleans;
 using Orleans.Hosting;
 
-[assembly: GenerateCodeForDeclaringAssembly(typeof(Grains.YourReminderGrain))]
+[assembly: GenerateCodeForDeclaringAssembly(typeof(YourReminderGrain))]
 
 using var host = new HostBuilder()
     .UseOrleans(builder =>
@@ -13,7 +13,8 @@ using var host = new HostBuilder()
         builder.UseLocalhostClustering();
         builder.UseInMemoryReminderService();
         builder.UseDashboard();
-        builder.ConfigureServices(_ => _.AddHostedService<GrainActivatorHostedService.GrainActivatorHostedService>());
+        builder.ConfigureServices(services =>
+            services.AddHostedService<GrainActivatorHostedService.GrainActivatorHostedService>());
     })
     .UseConsoleLifetime()
     .Build();

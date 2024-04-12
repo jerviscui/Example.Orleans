@@ -16,7 +16,8 @@ type YourReminderGrain() =
     interface IYourReminderGrain with
         member this.WakeUp() = Task.CompletedTask
         member this.ReceiveReminder(reminderName, status) =
-            Console.WriteLine(reminderName, status)
+            Console.WriteLine("reminderName: {0}", reminderName)
+            Console.WriteLine("status: {0}", status)
             Task.CompletedTask
         
     override _.OnActivateAsync(cancellationToken:CancellationToken) = 
