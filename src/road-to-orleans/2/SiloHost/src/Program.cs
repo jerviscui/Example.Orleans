@@ -2,13 +2,11 @@
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Grains;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.Statistics;
 
 namespace SiloHost
 {
@@ -21,11 +19,16 @@ namespace SiloHost
             return new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    siloBuilder.UseLinuxEnvironmentStatistics();
                     siloBuilder.UseDashboard(dashboardOptions =>
                     {
-                        dashboardOptions.Username = "piotr";
-                        dashboardOptions.Password = "orleans";
+                        //dashboardOptions.Username = "piotr";
+                        //dashboardOptions.Password = "orleans";
+                        dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                    });
+                    siloBuilder.Configure<ClusterOptions>(options =>
+                    {
+                        options.ClusterId = "road2";
+                        options.ServiceId = "server";
                     });
                     siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<EndpointOptions>(endpointOptions =>
@@ -36,8 +39,6 @@ namespace SiloHost
                         endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, 2000);
                         endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, 3000);
                     });
-                    siloBuilder.ConfigureApplicationParts(applicationPartManager =>
-                        applicationPartManager.AddApplicationPart(typeof(HelloWorld).Assembly).WithReferences());
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
                 .RunConsoleAsync();
