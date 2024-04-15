@@ -23,7 +23,7 @@ namespace Client
             await Host.CreateDefaultBuilder(args)
                 .UseOrleansClient(clientBuilder =>
                 {
-                    clientBuilder.UseLocalhostClustering(siloGatewayPort, "road2", "server");
+                    clientBuilder.UseLocalhostClustering(siloGatewayPort, "client", "road2");
                     clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
                     {
                         logger.LogError(exception, "Connection Retry");

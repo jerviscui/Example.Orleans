@@ -10,7 +10,7 @@ using Orleans.Hosting;
 
 namespace SiloHost
 {
-    class Program
+    internal class Program
     {
         public static Task Main()
         {
@@ -46,7 +46,7 @@ namespace SiloHost
 
         private static SiloEndpointConfiguration GetSiloEndpointConfiguration()
         {
-            return new(GetLocalIpAddress(), 2000, 3000);
+            return new SiloEndpointConfiguration(GetLocalIpAddress(), 2000, 3000);
         }
 
         private static IPAddress GetLocalIpAddress()
@@ -55,11 +55,15 @@ namespace SiloHost
             foreach (var network in networkInterfaces)
             {
                 if (network.OperationalStatus != OperationalStatus.Up)
+                {
                     continue;
+                }
 
                 var properties = network.GetIPProperties();
                 if (properties.GatewayAddresses.Count == 0)
+                {
                     continue;
+                }
 
                 foreach (var address in properties.UnicastAddresses)
                 {
