@@ -1,7 +1,10 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -12,11 +15,11 @@ namespace SiloHost
 {
     internal class Program
     {
-        public static Task Main()
+        public static async Task Main()
         {
             var siloEndpointConfiguration = GetSiloEndpointConfiguration();
 
-            return new HostBuilder()
+            var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
                     siloBuilder.UseDashboard(dashboardOptions =>
@@ -41,7 +44,17 @@ namespace SiloHost
                     });
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
-                .RunConsoleAsync();
+                .UseConsoleLifetime()
+                .Build();
+
+            await host.StartAsync();
+
+            var factory = host.Services.GetRequiredService<IGrainFactory>();
+            var grain = factory.GetGrain<IHelloWorld>(0);
+            Console.WriteLine(await grain.SayHello("Server"));
+
+            Console.ReadLine();
+            await host.StopAsync();
         }
 
         private static SiloEndpointConfiguration GetSiloEndpointConfiguration()
