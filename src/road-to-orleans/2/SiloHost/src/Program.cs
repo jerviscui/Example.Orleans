@@ -53,8 +53,9 @@ namespace SiloHost
             var grain = factory.GetGrain<IHelloWorld>(0);
             Console.WriteLine(await grain.SayHello("Server"));
 
-            Console.ReadLine();
-            await host.StopAsync();
+            await host.WaitForShutdownAsync();
+            //Console.ReadLine();
+            //await host.StopAsync();
         }
 
         private static SiloEndpointConfiguration GetSiloEndpointConfiguration()
