@@ -7,6 +7,7 @@ using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Metrics;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -23,12 +24,12 @@ namespace SiloHost
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    siloBuilder.UseDashboard(dashboardOptions =>
-                    {
-                        //dashboardOptions.Username = "piotr";
-                        //dashboardOptions.Password = "orleans";
-                        dashboardOptions.CounterUpdateIntervalMs = 10_000;
-                    });
+                    //siloBuilder.UseDashboard(dashboardOptions =>
+                    //{
+                    //    //dashboardOptions.Username = "piotr";
+                    //    //dashboardOptions.Password = "orleans";
+                    //    dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                    //});
                     siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<ClusterOptions>(options =>
                     {
@@ -44,6 +45,16 @@ namespace SiloHost
                         endpointOptions.GatewayPort = siloEndpointConfiguration.GatewayPort;
                         endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, 2000);
                         endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, 3000);
+                    });
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddOpenTelemetry().WithMetrics(builder =>
+                    {
+                        builder.AddMeter("Microsoft.Orleans");
+
+                        builder.AddConsoleExporter();
+                        //builder.AddPrometheusExporter();
                     });
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
