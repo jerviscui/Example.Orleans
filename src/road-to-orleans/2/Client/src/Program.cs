@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Orleans.Configuration;
 using Orleans.Hosting;
 
 namespace Client
@@ -23,7 +24,12 @@ namespace Client
             await Host.CreateDefaultBuilder(args)
                 .UseOrleansClient(clientBuilder =>
                 {
-                    clientBuilder.UseLocalhostClustering(siloGatewayPort, "client", "road2");
+                    clientBuilder.UseStaticClustering(new IPEndPoint(siloAdvertisedIpAddress, siloGatewayPort));
+                    clientBuilder.Configure<ClusterOptions>(options =>
+                    {
+                        options.ClusterId = "road2";
+                        options.ServiceId = "client";
+                    });
                     clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
                     {
                         logger.LogError(exception, "Connection Retry");

@@ -17,6 +17,7 @@ namespace SiloHost
     {
         public static async Task Main()
         {
+            var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var siloEndpointConfiguration = GetSiloEndpointConfiguration();
 
             var host = new HostBuilder()
@@ -28,15 +29,17 @@ namespace SiloHost
                         //dashboardOptions.Password = "orleans";
                         dashboardOptions.CounterUpdateIntervalMs = 10_000;
                     });
+                    siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<ClusterOptions>(options =>
                     {
                         options.ClusterId = "road2";
                         options.ServiceId = "server";
                     });
-                    siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<EndpointOptions>(endpointOptions =>
                     {
-                        endpointOptions.AdvertisedIPAddress = siloEndpointConfiguration.Ip;
+                        endpointOptions.AdvertisedIPAddress = advertisedIp is null
+                            ? siloEndpointConfiguration.Ip
+                            : IPAddress.Parse(advertisedIp);
                         endpointOptions.SiloPort = siloEndpointConfiguration.SiloPort;
                         endpointOptions.GatewayPort = siloEndpointConfiguration.GatewayPort;
                         endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, 2000);
