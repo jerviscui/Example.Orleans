@@ -3,75 +3,67 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Grains;
+using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.Statistics;
-using StatsdClient;
 
 namespace SiloHost
 {
-    class Program
+    internal class Program
     {
-        public static Task Main()
+        public static async Task Main()
         {
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
-            var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
-            var gatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "3000");
+            var siloEndpointConfiguration = GetSiloEndpointConfiguration();
 
-            var siloEndpointConfiguration = GetSiloEndpointConfiguration(advertisedIpAddress, gatewayPort);
-
-            return new HostBuilder()
+            var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    siloBuilder.UseLinuxEnvironmentStatistics();
                     siloBuilder.UseDashboard(dashboardOptions =>
                     {
-                        dashboardOptions.Username = "piotr";
-                        dashboardOptions.Password = "orleans";
+                        //dashboardOptions.Username = "piotr";
+                        //dashboardOptions.Password = "orleans";
+                        dashboardOptions.CounterUpdateIntervalMs = 10_000;
                     });
                     siloBuilder.UseLocalhostClustering();
+                    siloBuilder.Configure<ClusterOptions>(options =>
+                    {
+                        options.ClusterId = "road2";
+                        options.ServiceId = "server";
+                    });
                     siloBuilder.Configure<EndpointOptions>(endpointOptions =>
                     {
-                        endpointOptions.AdvertisedIPAddress = siloEndpointConfiguration.Ip;
+                        endpointOptions.AdvertisedIPAddress = advertisedIp is null
+                            ? siloEndpointConfiguration.Ip
+                            : IPAddress.Parse(advertisedIp);
                         endpointOptions.SiloPort = siloEndpointConfiguration.SiloPort;
                         endpointOptions.GatewayPort = siloEndpointConfiguration.GatewayPort;
                         endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, 2000);
-                        endpointOptions.GatewayListeningEndpoint =
-                            new IPEndPoint(IPAddress.Any, siloEndpointConfiguration.GatewayPort);
+                        endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, 3000);
                     });
-                    siloBuilder.ConfigureServices(services =>
-                    {
-                        // This is how the `DatadogTelemetryConsumer` is configured.
-                        // More on statsd configuration here:
-                        // https://docs.datadoghq.com/developers/service_checks/dogstatsd_service_checks_submission/
-                        // services.AddSingleton(serviceProvider =>
-                        //     new DatadogTelemetryConsumer(
-                        //         new[] {"App.Requests.Total.Requests.Current"},
-                        //         new StatsdConfig
-                        //         {
-                        //             StatsdServerName = "127.0.0.1",
-                        //             StatsdPort = 8125
-                        //         }));
-                        services.Configure<TelemetryOptions>(
-                            telemetryOptions => telemetryOptions.AddConsumer<DatadogTelemetryConsumer>());
-                    });
-                    siloBuilder.ConfigureApplicationParts(applicationPartManager =>
-                        applicationPartManager.AddApplicationPart(typeof(HelloWorld).Assembly).WithReferences());
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
-                .RunConsoleAsync();
+                .UseConsoleLifetime()
+                .Build();
+
+            await host.StartAsync();
+
+            var factory = host.Services.GetRequiredService<IGrainFactory>();
+            var grain = factory.GetGrain<IHelloWorld>(0);
+            Console.WriteLine(await grain.SayHello("Server"));
+
+            await host.WaitForShutdownAsync();
+            //Console.ReadLine();
+            //await host.StopAsync();
         }
 
-        private static SiloEndpointConfiguration GetSiloEndpointConfiguration(
-            IPAddress advertisedAddress,
-            int gatewayPort)
+        private static SiloEndpointConfiguration GetSiloEndpointConfiguration()
         {
-            return new(advertisedAddress, 2000, gatewayPort);
+            return new SiloEndpointConfiguration(GetLocalIpAddress(), 2000, 3000);
         }
 
         private static IPAddress GetLocalIpAddress()
@@ -80,11 +72,15 @@ namespace SiloHost
             foreach (var network in networkInterfaces)
             {
                 if (network.OperationalStatus != OperationalStatus.Up)
+                {
                     continue;
+                }
 
                 var properties = network.GetIPProperties();
                 if (properties.GatewayAddresses.Count == 0)
+                {
                     continue;
+                }
 
                 foreach (var address in properties.UnicastAddresses)
                 {

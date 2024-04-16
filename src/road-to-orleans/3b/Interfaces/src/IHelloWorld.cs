@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Orleans;
 
 namespace Interfaces
 {
-    public interface IHelloWorld : Orleans.IGrainWithIntegerKey
+    public interface IHelloWorld : IGrainWithIntegerKey
     {
         Task<string> SayHello(string name);
     }
