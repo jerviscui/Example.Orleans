@@ -54,7 +54,6 @@ namespace SiloHost
                         builder.AddMeter("Microsoft.Orleans");
 
                         builder.AddConsoleExporter();
-                        //builder.AddPrometheusExporter();
                     });
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
