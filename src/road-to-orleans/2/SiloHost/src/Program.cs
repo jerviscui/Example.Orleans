@@ -47,6 +47,7 @@ namespace SiloHost
                     });
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
+                //.RunConsoleAsync()
                 .UseConsoleLifetime()
                 .Build();
 
@@ -57,8 +58,6 @@ namespace SiloHost
             Console.WriteLine(await grain.SayHello("Server"));
 
             await host.WaitForShutdownAsync();
-            //Console.ReadLine();
-            //await host.StopAsync();
         }
 
         private static SiloEndpointConfiguration GetSiloEndpointConfiguration()

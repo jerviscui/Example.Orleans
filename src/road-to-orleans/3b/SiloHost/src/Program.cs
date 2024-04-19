@@ -7,6 +7,7 @@ using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using Orleans;
 using Orleans.Configuration;
@@ -24,12 +25,12 @@ namespace SiloHost
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    //siloBuilder.UseDashboard(dashboardOptions =>
-                    //{
-                    //    //dashboardOptions.Username = "piotr";
-                    //    //dashboardOptions.Password = "orleans";
-                    //    dashboardOptions.CounterUpdateIntervalMs = 10_000;
-                    //});
+                    siloBuilder.UseDashboard(dashboardOptions =>
+                    {
+                        //dashboardOptions.Username = "piotr";
+                        //dashboardOptions.Password = "orleans";
+                        dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                    });
                     siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<ClusterOptions>(options =>
                     {
@@ -53,7 +54,14 @@ namespace SiloHost
                     {
                         builder.AddMeter("Microsoft.Orleans");
 
-                        builder.AddConsoleExporter();
+                        //builder.AddConsoleExporter();
+                        builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
+                        {
+                            exporterOptions.Endpoint =
+                                new Uri("http://localhost:9090/api/v1/otlp/v1/metrics");
+                            exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
+                        });
                     });
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
@@ -67,8 +75,6 @@ namespace SiloHost
             Console.WriteLine(await grain.SayHello("Server"));
 
             await host.WaitForShutdownAsync();
-            //Console.ReadLine();
-            //await host.StopAsync();
         }
 
         private static SiloEndpointConfiguration GetSiloEndpointConfiguration()
