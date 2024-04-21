@@ -34,7 +34,7 @@ namespace SiloHost
                     siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<ClusterOptions>(options =>
                     {
-                        options.ClusterId = "road2";
+                        options.ClusterId = "road3";
                         options.ServiceId = "server";
                     });
                     siloBuilder.Configure<EndpointOptions>(endpointOptions =>

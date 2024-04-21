@@ -27,7 +27,7 @@ namespace Client
                     clientBuilder.UseStaticClustering(new IPEndPoint(siloAdvertisedIpAddress, siloGatewayPort));
                     clientBuilder.Configure<ClusterOptions>(options =>
                     {
-                        options.ClusterId = "road2";
+                        options.ClusterId = "road3";
                         options.ServiceId = "client";
                     });
                     clientBuilder.UseConnectionRetryFilter(async (exception, token) =>

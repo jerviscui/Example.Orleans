@@ -21,13 +21,14 @@ namespace Client
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var siloAdvertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
             var siloGatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "3000");
+
             await Host.CreateDefaultBuilder(args)
                 .UseOrleansClient(clientBuilder =>
                 {
                     clientBuilder.UseStaticClustering(new IPEndPoint(siloAdvertisedIpAddress, siloGatewayPort));
                     clientBuilder.Configure<ClusterOptions>(options =>
                     {
-                        options.ClusterId = "road2";
+                        options.ClusterId = "road4";
                         options.ServiceId = "client";
                     });
                     clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
