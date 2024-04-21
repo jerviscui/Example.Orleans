@@ -13,6 +13,14 @@ IConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfig);
 
 Task<IConnectionMultiplexer> GetRedisConnection() => Task.FromResult(connection);
 
+string? serviceInstanceId = null;
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Development") ?? false)
+{
+    serviceInstanceId = "dev";
+}
+
+var clusterId = "dev";
+
 builder.Host.UseOrleans(siloBuilder =>
 {
     siloBuilder.AddRedisGrainStorage(UrlShortenerGrain.Storage,
@@ -33,7 +41,7 @@ builder.Host.UseOrleans(siloBuilder =>
 
     siloBuilder.Configure<ClusterOptions>(options =>
     {
-        options.ClusterId = "dev";
+        options.ClusterId = clusterId;
         options.ServiceId = "UrlApp";
     });
     siloBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
@@ -48,7 +56,7 @@ builder.Services.AddOpenTelemetry()
     .WithTracing(providerBuilder =>
     {
         providerBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-            .AddService("UrlShortener", serviceVersion: "1.0.0", serviceInstanceId: "local"));
+            .AddService("UrlShortener", serviceVersion: "1.0.0", serviceInstanceId: serviceInstanceId));
 
         providerBuilder.SetSampler(new AlwaysOnSampler());
 
@@ -71,7 +79,9 @@ builder.Services.AddOpenTelemetry()
     .WithMetrics(providerBuilder =>
     {
         providerBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-            .AddService("UrlShortener", serviceVersion: "1.0.0", serviceInstanceId: "local"));
+            //.AddAttributes([new KeyValuePair<string, object>("cluster", clusterId)])
+            .AddService("UrlShortener", serviceVersion: "1.0.0",
+                serviceInstanceId: serviceInstanceId /*, serviceNamespace: "test"*/));
 
         providerBuilder.AddMeter("Microsoft.Orleans");
 
