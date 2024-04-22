@@ -22,12 +22,10 @@ namespace SiloHost
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT")
-                ?? throw new Exception("Silo port cannot be null");
+            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "2000";
             var siloPort = int.Parse(extractedSiloPort);
 
-            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ??
-                throw new Exception("Gateway port cannot be null");
+            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "3000";
             var gatewayPort = int.Parse(extractedGatewayPort);
 
             // For the sake of simplicity, a primary silo is used here (even though all silos are peers in the cluster) as in-memory cluster membership emulation was utilised in this example.

@@ -20,7 +20,9 @@ namespace Client
 
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var siloAdvertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
+
             var siloGatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "3000");
+
             await Host.CreateDefaultBuilder(args)
                 .UseOrleansClient(clientBuilder =>
                 {
@@ -30,6 +32,7 @@ namespace Client
                         options.ClusterId = "road3";
                         options.ServiceId = "client";
                     });
+
                     clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
                     {
                         logger.LogError(exception, "Connection Retry");

@@ -31,6 +31,7 @@ namespace SiloHost
                         //dashboardOptions.Password = "orleans";
                         dashboardOptions.CounterUpdateIntervalMs = 10_000;
                     });
+
                     siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<ClusterOptions>(options =>
                     {
@@ -44,8 +45,10 @@ namespace SiloHost
                             : IPAddress.Parse(advertisedIp);
                         endpointOptions.SiloPort = siloEndpointConfiguration.SiloPort;
                         endpointOptions.GatewayPort = siloEndpointConfiguration.GatewayPort;
-                        endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, 2000);
-                        endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, 3000);
+                        endpointOptions.SiloListeningEndpoint =
+                            new IPEndPoint(IPAddress.Any, siloEndpointConfiguration.SiloPort);
+                        endpointOptions.GatewayListeningEndpoint =
+                            new IPEndPoint(IPAddress.Any, siloEndpointConfiguration.GatewayPort);
                     });
                 })
                 .ConfigureServices(services =>
