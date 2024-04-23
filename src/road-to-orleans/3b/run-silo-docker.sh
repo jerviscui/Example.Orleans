@@ -4,11 +4,9 @@ RetrieveIp(){
 }
 
 ADVERTISEDIP=`RetrieveIp`
-GATEWAYPORT=13000
+GATEWAYPORT=30000
 
 docker build -t silo-host-cluster -f ./ops/Dockerfile-host . &&
-  # docker run -it -e ADVERTISEDIP=$ADVERTISEDIP \
-  # -p 13000:3000 -p 18080:8080 \
   docker run -it -e ADVERTISEDIP=$ADVERTISEDIP -e GATEWAYPORT=$GATEWAYPORT \
   -p $GATEWAYPORT:$GATEWAYPORT -p 18080:8080 \
   --rm silo-host-cluster

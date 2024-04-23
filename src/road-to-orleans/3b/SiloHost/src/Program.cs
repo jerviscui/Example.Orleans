@@ -22,10 +22,10 @@ namespace SiloHost
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "2000";
+            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "11111";
             var siloPort = int.Parse(extractedSiloPort);
 
-            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "3000";
+            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000";
             var gatewayPort = int.Parse(extractedGatewayPort);
 
             Console.WriteLine(advertisedIpAddress);
