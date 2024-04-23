@@ -21,7 +21,10 @@ namespace Client
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var siloAdvertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-            var siloGatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "13000");
+            var siloGatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "3000");
+
+            Console.WriteLine(siloAdvertisedIpAddress);
+            Console.WriteLine(siloGatewayPort);
 
             await Host.CreateDefaultBuilder(args)
                 .UseOrleansClient(clientBuilder =>

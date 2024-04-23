@@ -7,6 +7,9 @@ Client 连接到 silo 持续调用 Grain，输出 Hello Piotr!
 运行 run-silo-local.sh
 收集 Microsoft.Orleans Meter 并输出到 Console 或 OtlpExporter。
 
+运行 run-client-docker.sh 和 run-silo-docker.sh
+在 docker 中部署 client 和 server 并通信。
+
 This example builds on top of Solution 3 by introducing datadog as an APM tool. The goal is to demonstrate how to:
 
 * send orleans metrics to datadog
