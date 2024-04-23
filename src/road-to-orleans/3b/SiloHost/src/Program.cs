@@ -25,12 +25,12 @@ namespace SiloHost
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    siloBuilder.UseDashboard(dashboardOptions =>
-                    {
-                        //dashboardOptions.Username = "piotr";
-                        //dashboardOptions.Password = "orleans";
-                        dashboardOptions.CounterUpdateIntervalMs = 10_000;
-                    });
+                    //siloBuilder.UseDashboard(dashboardOptions =>
+                    //{
+                    //    //dashboardOptions.Username = "piotr";
+                    //    //dashboardOptions.Password = "orleans";
+                    //    dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                    //});
 
                     siloBuilder.UseLocalhostClustering();
                     siloBuilder.Configure<ClusterOptions>(options =>
@@ -82,7 +82,7 @@ namespace SiloHost
 
         private static SiloEndpointConfiguration GetSiloEndpointConfiguration()
         {
-            return new SiloEndpointConfiguration(GetLocalIpAddress(), 2000, 3000);
+            return new SiloEndpointConfiguration(GetLocalIpAddress(), 2000, 13000);
         }
 
         private static IPAddress GetLocalIpAddress()

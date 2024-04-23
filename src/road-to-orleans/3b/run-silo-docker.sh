@@ -6,4 +6,6 @@ RetrieveIp(){
 ADVERTISEDIP=`RetrieveIp`
 
 docker build -t silo-host-cluster -f ./ops/Dockerfile-host . &&
-  docker run -it -e ADVERTISEDIP=$ADVERTISEDIP -p 8080:8080 -p 3000:3000 --rm silo-host-cluster
+  docker run -it -e ADVERTISEDIP=$ADVERTISEDIP \
+  -p 3000:3000 -p 8080:8080 \
+  --rm silo-host-cluster
