@@ -73,7 +73,6 @@ namespace SiloHost
                     {
                         builder.AddMeter("Microsoft.Orleans");
 
-                        //builder.AddConsoleExporter();
                         builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
                         {
                             exporterOptions.Endpoint =

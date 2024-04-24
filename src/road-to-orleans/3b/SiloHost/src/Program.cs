@@ -7,8 +7,8 @@ using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -60,16 +60,24 @@ namespace SiloHost
                 {
                     services.AddOpenTelemetry().WithMetrics(builder =>
                     {
-                        builder.AddMeter("Microsoft.Orleans");
+                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                            .AddService("server", serviceVersion: "1.0.0",
+                                serviceInstanceId: GetLocalIpAddress().ToString(),
+                                serviceNamespace: "dev"));
 
-                        //builder.AddConsoleExporter();
-                        builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
-                        {
-                            exporterOptions.Endpoint =
-                                new Uri("http://localhost:9090/api/v1/otlp/v1/metrics");
-                            exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-                            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
-                        });
+                        //Orleans.Runtime.InstrumentNames
+                        //GrainInstruments
+                        //builder.AddMeter("Microsoft.Orleans");
+                        builder.AddMeter("orleans-messaging-sent-messages-size");
+
+                        builder.AddConsoleExporter();
+                        //builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
+                        //{
+                        //    exporterOptions.Endpoint =
+                        //        new Uri("http://localhost:9090/api/v1/otlp/v1/metrics");
+                        //    exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                        //    metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
+                        //});
                     });
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
