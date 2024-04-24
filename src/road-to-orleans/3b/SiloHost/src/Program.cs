@@ -7,6 +7,7 @@ using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using Orleans;
@@ -65,19 +66,16 @@ namespace SiloHost
                                 serviceInstanceId: GetLocalIpAddress().ToString(),
                                 serviceNamespace: "dev"));
 
-                        //Orleans.Runtime.InstrumentNames
-                        //GrainInstruments
-                        //builder.AddMeter("Microsoft.Orleans");
-                        builder.AddMeter("orleans-messaging-sent-messages-size");
+                        builder.AddMeter("Microsoft.Orleans");
 
-                        builder.AddConsoleExporter();
-                        //builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
-                        //{
-                        //    exporterOptions.Endpoint =
-                        //        new Uri("http://localhost:9090/api/v1/otlp/v1/metrics");
-                        //    exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        //    metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
-                        //});
+                        //builder.AddConsoleExporter();
+                        builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
+                        {
+                            exporterOptions.Endpoint =
+                                new Uri("http://localhost:9090/api/v1/otlp/v1/metrics");
+                            exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
+                        });
                     });
                 })
                 .ConfigureLogging(logging => logging.AddConsole())
