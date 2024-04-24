@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine as build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.204-alpine as build
 
 WORKDIR /src
 
@@ -20,7 +20,7 @@ COPY ./ops/SiloHost/entrypoint.sh /SiloHost/
 RUN dotnet publish --verbosity normal "./SiloHost/SiloHost.fsproj" --configuration Release --output /SiloHost
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.4-alpine3.19
 
 WORKDIR /SiloHost
 COPY --from=build /SiloHost ./
