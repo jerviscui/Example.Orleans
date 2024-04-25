@@ -16,10 +16,29 @@ namespace Client
             _clusterClient = clusterClient;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(0);
-            Console.WriteLine($"{await helloWorldGrain.SayHello("Piotr")}");
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            Task.Run(async () =>
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        Console.WriteLine($"{await helloWorldGrain.SayHello("Piotr")}");
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+
+                    await Task.Delay(1_000, cancellationToken);
+                }
+            }, cancellationToken);
+
+            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

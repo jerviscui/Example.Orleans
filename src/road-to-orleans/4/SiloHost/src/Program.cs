@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -22,10 +23,10 @@ namespace SiloHost
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "2000";
+            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "11111";
             var siloPort = int.Parse(extractedSiloPort);
 
-            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "3000";
+            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000";
             var gatewayPort = int.Parse(extractedGatewayPort);
 
             // For the sake of simplicity, a primary silo is used here (even though all silos are peers in the cluster) as in-memory cluster membership emulation was utilised in this example.
@@ -33,13 +34,11 @@ namespace SiloHost
             var primaryAddress = Environment.GetEnvironmentVariable("PRIMARYADDRESS");
             var primaryIp = primaryAddress == null ? advertisedIpAddress : IPAddress.Parse(primaryAddress);
 
-            var extractedPrimaryPort = Environment.GetEnvironmentVariable("PRIMARYPORT") ??
-                throw new Exception("Primary port cannot be null");
-            var developmentPeerPort = int.Parse(extractedPrimaryPort);
+            var primaryPort = Environment.GetEnvironmentVariable("PRIMARYPORT");
+            var primarySiloPort = primaryPort == null ? siloPort : int.Parse(primaryPort);
 
-            var extractDashboardPort = Environment.GetEnvironmentVariable("DASHBOARDPORT") ??
-                throw new Exception("Dashboard port cannot be null");
-            var dashboardPort = int.Parse(extractDashboardPort);
+            Console.WriteLine(advertisedIpAddress);
+            Console.WriteLine(gatewayPort);
 
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
@@ -49,10 +48,9 @@ namespace SiloHost
                         //dashboardOptions.Username = "piotr";
                         //dashboardOptions.Password = "orleans";
                         dashboardOptions.CounterUpdateIntervalMs = 10_000;
-                        dashboardOptions.Port = dashboardPort;
                     });
                     siloBuilder.UseLocalhostClustering(
-                        primarySiloEndpoint: new IPEndPoint(primaryIp, developmentPeerPort));
+                        primarySiloEndpoint: new IPEndPoint(primaryIp, primarySiloPort));
                     siloBuilder.Configure<ClusterOptions>(options =>
                     {
                         options.ClusterId = "road4";
@@ -63,20 +61,25 @@ namespace SiloHost
                         endpointOptions.AdvertisedIPAddress = advertisedIpAddress;
                         endpointOptions.SiloPort = siloPort;
                         endpointOptions.GatewayPort = gatewayPort;
-                        endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, siloPort + 10_000);
-                        endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort + 10_000);
+                        endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, siloPort);
+                        endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
                     });
                 })
                 .ConfigureServices(services =>
                 {
                     services.AddOpenTelemetry().WithMetrics(builder =>
                     {
+                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                            .AddService("server", serviceVersion: "1.0.0",
+                                serviceInstanceId: GetLocalIpAddress().ToString(),
+                                serviceNamespace: "dev"));
+
                         builder.AddMeter("Microsoft.Orleans");
 
                         builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
                         {
                             exporterOptions.Endpoint =
-                                new Uri("http://localhost:9090/api/v1/otlp/v1/metrics");
+                                new Uri("http://host.docker.internal:9090/api/v1/otlp/v1/metrics");
                             exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
                             metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
                         });

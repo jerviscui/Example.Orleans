@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Interfaces;
 using Orleans;
 
@@ -6,9 +7,11 @@ namespace Grains
 {
     public class HelloWorld : Grain, IHelloWorld
     {
-        public Task<string> SayHello(string name)
+        public async Task<string> SayHello(string name)
         {
-            return Task.FromResult($"Hello {name}!");
+            await Task.Delay(Random.Shared.Next(10, 50));
+
+            return $"Hello {name}!";
         }
     }
 }

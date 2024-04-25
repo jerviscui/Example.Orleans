@@ -4,7 +4,7 @@ RetrieveIp(){
 }
 
 ADVERTISEDIP=`RetrieveIp`
-GATEWAYPORT=3000
+GATEWAYPORT=30000
 
 docker build -t silo-client -f ./ops/Dockerfile-client . &&
   docker run -it -e ADVERTISEDIP=$ADVERTISEDIP -e GATEWAYPORT=$GATEWAYPORT --rm silo-client
