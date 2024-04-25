@@ -72,7 +72,7 @@ namespace SiloHost
                         builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
                         {
                             exporterOptions.Endpoint =
-                                new Uri("http://localhost:9090/api/v1/otlp/v1/metrics");
+                                new Uri("http://host.docker.internal:9090/api/v1/otlp/v1/metrics");
                             exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
                             metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
                         });

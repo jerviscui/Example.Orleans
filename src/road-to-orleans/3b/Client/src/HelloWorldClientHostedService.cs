@@ -34,7 +34,7 @@ namespace Client
                         // ignore
                     }
 
-                    await Task.Delay(5_000, cancellationToken);
+                    await Task.Delay(1_000, cancellationToken);
                 }
             }, cancellationToken);
         }
