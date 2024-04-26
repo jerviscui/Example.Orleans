@@ -4,7 +4,7 @@ RetrieveIp(){
 }
 
 ADVERTISEDIP=`RetrieveIp`
-GATEWAYPORT=30001
+GATEWAYPORT="30001,30002,30003"
 
 docker build -t client-cluster -f ./ops/Dockerfile-client . &&
   docker run -d -e ADVERTISEDIP=$ADVERTISEDIP -e GATEWAYPORT=$GATEWAYPORT --rm client-cluster

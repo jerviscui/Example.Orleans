@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -72,7 +73,8 @@ namespace SiloHost
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                             .AddService("server", serviceVersion: "1.0.0",
                                 serviceInstanceId: GetLocalIpAddress().ToString(),
-                                serviceNamespace: "dev"));
+                                serviceNamespace: "dev")
+                            .AddAttributes([new KeyValuePair<string, object>("cluster", "road4")]));
 
                         builder.AddMeter("Microsoft.Orleans");
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -21,15 +22,17 @@ namespace Client
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var siloAdvertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-            var siloGatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000");
+            var gatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000";
+            var arr = gatewayPort.Split(",", StringSplitOptions.RemoveEmptyEntries);
+            var endPoints = arr.Select(o => new IPEndPoint(siloAdvertisedIpAddress, int.Parse(o))).ToArray();
 
             Console.WriteLine(siloAdvertisedIpAddress);
-            Console.WriteLine(siloGatewayPort);
+            Console.WriteLine(endPoints);
 
             await Host.CreateDefaultBuilder(args)
                 .UseOrleansClient(clientBuilder =>
                 {
-                    clientBuilder.UseStaticClustering(new IPEndPoint(siloAdvertisedIpAddress, siloGatewayPort));
+                    clientBuilder.UseStaticClustering(endPoints);
                     clientBuilder.Configure<ClusterOptions>(options =>
                     {
                         options.ClusterId = "road4";
