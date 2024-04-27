@@ -42,6 +42,7 @@ namespace SiloHost
             Console.WriteLine(gatewayPort);
 
             var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
+            instance += ":" + extractedSiloPort;
 
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
@@ -85,7 +86,9 @@ namespace SiloHost
                             exporterOptions.Endpoint =
                                 new Uri("http://host.docker.internal:9090/api/v1/otlp/v1/metrics");
                             exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-                            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000;
+                            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds =
+                                5_000; // default 60s
+                            //metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
                         });
                     });
                 })
