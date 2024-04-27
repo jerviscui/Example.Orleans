@@ -1,3 +1,4 @@
 # readme
 
-run with Redis Cluster
+Run with Redis Cluster.
+Cluster with 3 SiloHost and 1 SiloHost2.
