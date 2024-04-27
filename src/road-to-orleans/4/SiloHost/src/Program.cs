@@ -41,6 +41,8 @@ namespace SiloHost
             Console.WriteLine(advertisedIpAddress);
             Console.WriteLine(gatewayPort);
 
+            var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
+
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
@@ -72,7 +74,7 @@ namespace SiloHost
                     {
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                             .AddService("server", serviceVersion: "1.0.0",
-                                serviceInstanceId: GetLocalIpAddress().ToString(),
+                                serviceInstanceId: instance,
                                 serviceNamespace: "dev")
                             .AddAttributes([new KeyValuePair<string, object>("cluster", "road4")]));
 
