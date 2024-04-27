@@ -18,11 +18,12 @@ namespace Client
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(1, 20));
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Task.Run(async () =>
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             {
+                var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(1, 20));
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     try

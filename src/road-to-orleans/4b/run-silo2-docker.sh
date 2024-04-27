@@ -11,4 +11,4 @@ DASHBOARDPORT=28081
 docker build -t silo2-host-cluster -f ./ops/Dockerfile-host2 . &&
   docker run -d -e ADVERTISEDIP=$ADVERTISEDIP -e GATEWAYPORT=$GATEWAYPORT -e SILOPORT=$SILOPORT \
   -p $GATEWAYPORT:$GATEWAYPORT -p $SILOPORT:$SILOPORT -p $DASHBOARDPORT:28080 \
-  --rm silo2-host-cluster
+  silo2-host-cluster

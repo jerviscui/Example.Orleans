@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -55,6 +54,8 @@ namespace SiloHost
                         endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, siloPort);
                         endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
                     });
+
+                    siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
                 })
                 .ConfigureServices(services =>
                 {
@@ -83,9 +84,9 @@ namespace SiloHost
 
             await host.StartAsync();
 
-            var factory = host.Services.GetRequiredService<IGrainFactory>();
-            var grain = factory.GetGrain<IHelloWorld>(0);
-            Console.WriteLine(await grain.SayHello("Server"));
+            //var factory = host.Services.GetRequiredService<IGrainFactory>();
+            //var grain = factory.GetGrain<IHelloWorld>(0);
+            //Console.WriteLine(await grain.SayHello("Server"));
 
             await host.WaitForShutdownAsync();
         }

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run -d --rm client-cluster
+docker run -d client-cluster

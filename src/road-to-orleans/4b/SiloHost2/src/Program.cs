@@ -59,6 +59,8 @@ namespace SiloHost2
                         endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, siloPort);
                         endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
                     });
+
+                    siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
                 })
                 .ConfigureServices(services =>
                 {
