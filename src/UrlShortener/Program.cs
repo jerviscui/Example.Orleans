@@ -8,7 +8,7 @@ using UrlShortener;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var redisConfig = ConfigurationOptions.Parse("127.0.0.1:6379,DefaultDatabase=6,allowAdmin=true");
+var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
 IConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfig);
 
 Task<IConnectionMultiplexer> GetRedisConnection() => Task.FromResult(connection);

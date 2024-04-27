@@ -15,7 +15,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using StackExchange.Redis;
 
-namespace SiloHost
+namespace SiloHost2
 {
     internal class Program
     {
@@ -24,22 +24,26 @@ namespace SiloHost
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "11111";
+            var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "21111";
             var siloPort = int.Parse(extractedSiloPort);
 
-            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000";
+            var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "40000";
             var gatewayPort = int.Parse(extractedGatewayPort);
 
+            var clusterId = "dev";
             var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
             instance += ":" + extractedSiloPort;
 
-            var clusterId = "dev";
             var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
 
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    siloBuilder.UseDashboard(dashboardOptions => { dashboardOptions.CounterUpdateIntervalMs = 10_000; });
+                    siloBuilder.UseDashboard(dashboardOptions =>
+                    {
+                        dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                        dashboardOptions.Port = 28080;
+                    });
 
                     siloBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
                     siloBuilder.Configure<ClusterOptions>(options =>
@@ -61,7 +65,7 @@ namespace SiloHost
                     services.AddOpenTelemetry().WithMetrics(builder =>
                     {
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                            .AddService("road4b", serviceVersion: "1.0.0",
+                            .AddService("road4b2", serviceVersion: "1.0.0",
                                 serviceInstanceId: instance, serviceNamespace: clusterId));
 
                         builder.AddMeter("Microsoft.Orleans");
@@ -84,8 +88,8 @@ namespace SiloHost
             await host.StartAsync();
 
             var factory = host.Services.GetRequiredService<IGrainFactory>();
-            var grain = factory.GetGrain<IHelloWorld>(0);
-            Console.WriteLine(await grain.SayHello("Server"));
+            var grain = factory.GetGrain<IInterGrain>(0);
+            Console.WriteLine(await grain.SayInternal("Server2"));
 
             await host.WaitForShutdownAsync();
         }

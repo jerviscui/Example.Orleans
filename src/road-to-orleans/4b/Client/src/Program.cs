@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,7 +15,7 @@ namespace Client
             var factory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = factory.CreateLogger<Program>();
 
-            var redisConfig = ConfigurationOptions.Parse("127.0.0.1:6379,DefaultDatabase=6,allowAdmin=true");
+            var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
 
             await Host.CreateDefaultBuilder(args)
                 .UseOrleansClient(clientBuilder =>
@@ -26,8 +23,8 @@ namespace Client
                     clientBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
                     clientBuilder.Configure<ClusterOptions>(options =>
                     {
-                        options.ClusterId = "road4b";
-                        options.ServiceId = "client";
+                        options.ClusterId = "dev";
+                        options.ServiceId = "road4b";
                     });
 
                     clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
@@ -57,35 +54,6 @@ namespace Client
                     builder.AddConsole();
                 })
                 .RunConsoleAsync();
-        }
-
-        private static IPAddress GetLocalIpAddress()
-        {
-            var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-            foreach (var network in networkInterfaces)
-            {
-                if (network.OperationalStatus != OperationalStatus.Up)
-                {
-                    continue;
-                }
-
-                var properties = network.GetIPProperties();
-                if (properties.GatewayAddresses.Count == 0)
-                {
-                    continue;
-                }
-
-                foreach (var address in properties.UnicastAddresses)
-                {
-                    if (address.Address.AddressFamily == AddressFamily.InterNetwork &&
-                        !IPAddress.IsLoopback(address.Address))
-                    {
-                        return address.Address;
-                    }
-                }
-            }
-
-            return null;
         }
     }
 }
