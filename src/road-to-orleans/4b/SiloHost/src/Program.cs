@@ -21,8 +21,6 @@ namespace SiloHost
     {
         public static async Task Main()
         {
-            // TODO: Say hello to SonarLint!
-
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
@@ -41,7 +39,10 @@ namespace SiloHost
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    siloBuilder.UseDashboard(dashboardOptions => { dashboardOptions.CounterUpdateIntervalMs = 10_000; });
+                    siloBuilder.UseDashboard(dashboardOptions =>
+                    {
+                        dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                    });
 
                     siloBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
                     siloBuilder.Configure<ClusterOptions>(options =>

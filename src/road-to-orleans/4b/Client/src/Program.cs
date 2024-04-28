@@ -10,6 +10,10 @@ namespace Client
 {
     internal class Program
     {
+        protected Program()
+        {
+        }
+
         private static async Task Main(string[] args)
         {
             var factory = LoggerFactory.Create(builder => builder.AddConsole());
