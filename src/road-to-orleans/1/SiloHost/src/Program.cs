@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -10,7 +12,7 @@ using Orleans.Hosting;
 
 namespace SiloHost
 {
-    class Program
+    internal static class Program
     {
         public static Task Main()
         {
@@ -55,23 +57,23 @@ namespace SiloHost
             foreach (var network in networkInterfaces)
             {
                 if (network.OperationalStatus != OperationalStatus.Up)
+                {
                     continue;
+                }
 
                 var properties = network.GetIPProperties();
                 if (properties.GatewayAddresses.Count == 0)
-                    continue;
-
-                foreach (var address in properties.UnicastAddresses)
                 {
-                    if (address.Address.AddressFamily == AddressFamily.InterNetwork &&
-                        !IPAddress.IsLoopback(address.Address))
-                    {
-                        return address.Address;
-                    }
+                    continue;
                 }
+
+                return properties.UnicastAddresses.Where(o =>
+                        o.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(o.Address))
+                    .Select(o => o.Address)
+                    .First();
             }
 
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

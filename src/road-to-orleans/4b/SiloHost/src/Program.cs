@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -16,10 +17,12 @@ using StackExchange.Redis;
 
 namespace SiloHost
 {
-    internal class Program
+    internal static class Program
     {
         public static async Task Main()
         {
+            // TODO: Say hello to SonarLint!
+
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
@@ -107,17 +110,13 @@ namespace SiloHost
                     continue;
                 }
 
-                foreach (var address in properties.UnicastAddresses)
-                {
-                    if (address.Address.AddressFamily == AddressFamily.InterNetwork &&
-                        !IPAddress.IsLoopback(address.Address))
-                    {
-                        return address.Address;
-                    }
-                }
+                return properties.UnicastAddresses.Where(o =>
+                        o.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(o.Address))
+                    .Select(o => o.Address)
+                    .First();
             }
 
-            return null;
+            throw new NotImplementedException();
         }
     }
 }
