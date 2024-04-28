@@ -12,6 +12,7 @@ dotnet_diagnostic.S1135.severity = none
 dotnet_diagnostic.S1075.severity = suggestion
 
 # dotnet
+# dotnet_analyzer_diagnostic.category-Style.severity = warning
 
 # IDE0060: 删除未使用的参数
-dotnet_diagnostic.IDE0060.severity = warning
+# dotnet_diagnostic.IDE0060.severity = warning
