@@ -20,8 +20,23 @@ namespace SiloHost2
 {
     internal static class Program
     {
+        #region MyRegion
+
         public static async Task Main()
         {
+            GetLocalIpAddress();
+
+            Main();
+            abc:
+
+            
+
+            var arr = new int[]{1};
+            arr[1] = 1;
+
+
+            goto abc;
+
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
@@ -32,7 +47,7 @@ namespace SiloHost2
             var gatewayPort = int.Parse(extractedGatewayPort);
 
             var clusterId = "dev";
-            var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
+            var instance = Environment.GetEnvironmentVariable(variable:"HOSTNAME") ?? GetLocalIpAddress().ToString();
             instance += ":" + extractedSiloPort;
 
             var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
@@ -44,6 +59,7 @@ namespace SiloHost2
                     {
                         dashboardOptions.CounterUpdateIntervalMs = 10_000;
                         dashboardOptions.Port = 28080;
+
                     });
 
                     siloBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
@@ -96,6 +112,7 @@ namespace SiloHost2
 
             await host.WaitForShutdownAsync();
         }
+        #endregion
 
         private static IPAddress GetLocalIpAddress()
         {
