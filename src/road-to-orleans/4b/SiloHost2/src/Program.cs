@@ -20,12 +20,17 @@ namespace SiloHost2
 {
     internal static class Program
     {
+        private static Task Run() => Task.CompletedTask;
+
         #region MyRegion
 
         public static async Task Main()
         {
-            GetLocalIpAddress();
+            Run();
+            _ = GetLocalIpAddress();
 
+            var d = new DateTime();
+            var date = d.Date;
             Main();
             abc:
 

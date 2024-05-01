@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,6 +24,9 @@ namespace Client
 
         private static async Task Main(string[] args)
         {
+            List<int> list = new List<int>();
+
+            
             var factory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = factory.CreateLogger<Program>();
 
@@ -52,7 +59,7 @@ namespace Client
                         }
                         catch (TaskCanceledException)
                         {
-                            // cancell ignored
+                            // cancel ignored
                         }
 
                         return true;
