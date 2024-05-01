@@ -22,7 +22,7 @@
                   <Command>TemplateExpand</Command>
                   <ReadableContext>[CodeEditorHasFocus]</ReadableContext>
                 </Item>
-                <Item Id="{ec18115c-b93b-4127-aa55-48d6efb920f2}" />
+                <DeletedItem Id="{ec18115c-b93b-4127-aa55-48d6efb920f2}" />
               </Bindings>
             </Item>
             <Item Id="{0d070b5c-9bc8-4784-9071-548ab0ef93e9}" />
