@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Threading.Tasks;
-using Interfaces;
+﻿using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,44 +9,52 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using StackExchange.Redis;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace SiloHost2
 {
     internal static class Program
     {
-        private static Task Run() => Task.CompletedTask;
+        private static Task<int> Run() => Task.FromResult(1);
 
         #region MyRegion
 
         public static async Task Main()
         {
-            Run();
+            _ = await Run();
+            var v = await Run();
             _ = GetLocalIpAddress();
 
-            var d = new DateTime();
+            var d = new DateTime(1, DateTimeKind.Local);
             var date = d.Date;
-            Main();
-            abc:
+            if (v > 0)
+            {
+                await Main().ConfigureAwait(false);
+            }
+abc:
 
-            
-
-            var arr = new int[]{1};
+            var arr = new int[] { 1 };
             arr[1] = 1;
 
-
-            goto abc;
+            //goto abc;
 
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
             var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "21111";
-            var siloPort = int.Parse(extractedSiloPort);
+            var siloPort = int.Parse(extractedSiloPort, CultureInfo.CurrentCulture);
 
             var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "40000";
-            var gatewayPort = int.Parse(extractedGatewayPort);
+            var gatewayPort = int.Parse(extractedGatewayPort, CultureInfo.CurrentCulture);
 
             var clusterId = "dev";
-            var instance = Environment.GetEnvironmentVariable(variable:"HOSTNAME") ?? GetLocalIpAddress().ToString();
+            var instance = Environment.GetEnvironmentVariable(variable: "HOSTNAME") ?? GetLocalIpAddress().ToString();
             instance += ":" + extractedSiloPort;
 
             var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
@@ -60,20 +62,20 @@ namespace SiloHost2
             var host = new HostBuilder()
                 .UseOrleans(siloBuilder =>
                 {
-                    siloBuilder.UseDashboard(dashboardOptions =>
+                    _ = siloBuilder.UseDashboard(dashboardOptions =>
                     {
                         dashboardOptions.CounterUpdateIntervalMs = 10_000;
                         dashboardOptions.Port = 28080;
 
                     });
 
-                    siloBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
-                    siloBuilder.Configure<ClusterOptions>(options =>
+                    _ = siloBuilder.UseRedisClustering(options => options.ConfigurationOptions = redisConfig);
+                    _ = siloBuilder.Configure<ClusterOptions>(options =>
                     {
                         options.ClusterId = clusterId;
                         options.ServiceId = "road4b";
                     });
-                    siloBuilder.Configure<EndpointOptions>(endpointOptions =>
+                    _ = siloBuilder.Configure<EndpointOptions>(endpointOptions =>
                     {
                         endpointOptions.AdvertisedIPAddress = advertisedIpAddress;
                         endpointOptions.SiloPort = siloPort;
@@ -82,19 +84,18 @@ namespace SiloHost2
                         endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
                     });
 
-                    siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
+                    _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
                 })
                 .ConfigureServices(services =>
-                {
                     services.AddOpenTelemetry().WithMetrics(builder =>
                     {
-                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                             .AddService("road4b2", serviceVersion: "1.0.0",
                                 serviceInstanceId: instance, serviceNamespace: clusterId));
 
-                        builder.AddMeter("Microsoft.Orleans");
+                        _ = builder.AddMeter("Microsoft.Orleans");
 
-                        builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
+                        _ = builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
                         {
                             exporterOptions.Endpoint =
                                 new Uri("http://host.docker.internal:9090/api/v1/otlp/v1/metrics");
@@ -103,8 +104,7 @@ namespace SiloHost2
                                 5_000; // default 60s
                             //metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
                         });
-                    });
-                })
+                    }))
                 .ConfigureLogging(logging => logging.AddConsole())
                 .UseConsoleLifetime()
                 .Build();

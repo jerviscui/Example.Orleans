@@ -9,6 +9,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using StackExchange.Redis;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -66,10 +67,10 @@ internal class Program
         var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
         var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "11111";
-        var siloPort = int.Parse(extractedSiloPort);
+        var siloPort = int.Parse(extractedSiloPort, CultureInfo.CurrentCulture);
 
         var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000";
-        var gatewayPort = int.Parse(extractedGatewayPort);
+        var gatewayPort = int.Parse(extractedGatewayPort, CultureInfo.CurrentCulture);
 
         var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += ":" + extractedSiloPort;
@@ -80,18 +81,15 @@ internal class Program
         var host = new HostBuilder()
             .UseOrleans(siloBuilder =>
             {
-                siloBuilder.UseDashboard(dashboardOptions =>
-                {
-                    dashboardOptions.CounterUpdateIntervalMs = 10_000;
-                });
+                _ = siloBuilder.UseDashboard(dashboardOptions => dashboardOptions.CounterUpdateIntervalMs = 10_000);
 
-                siloBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
-                siloBuilder.Configure<ClusterOptions>(options =>
+                _ = siloBuilder.UseRedisClustering(options => options.ConfigurationOptions = redisConfig);
+                _ = siloBuilder.Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = clusterId;
                     options.ServiceId = "road4b";
                 });
-                siloBuilder.Configure<EndpointOptions>(endpointOptions =>
+                _ = siloBuilder.Configure<EndpointOptions>(endpointOptions =>
                 {
                     endpointOptions.AdvertisedIPAddress = advertisedIpAddress;
                     endpointOptions.SiloPort = siloPort;
@@ -100,19 +98,17 @@ internal class Program
                     endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
                 });
 
-                siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
+                _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
             })
-                .ConfigureServices(services =>
-                {
-                    services.AddOpenTelemetry().WithMetrics(builder =>
+                .ConfigureServices(services => _ = services.AddOpenTelemetry().WithMetrics(builder =>
                     {
-                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                         .AddService("road4b", serviceVersion: "1.0.0",
                             serviceInstanceId: instance, serviceNamespace: clusterId));
 
-                        builder.AddMeter("Microsoft.Orleans");
+                        _ = builder.AddMeter("Microsoft.Orleans");
 
-                        builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
+                        _ = builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
                         {
                             exporterOptions.Endpoint =
                                 new Uri("http://host.docker.internal:9090/api/v1/otlp/v1/metrics");
@@ -121,8 +117,7 @@ internal class Program
                                 5_000; // default 60s
                             //metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
                         });
-                    });
-                })
+                    }))
             .ConfigureLogging(logging => logging.AddConsole())
             .UseConsoleLifetime()
             .Build();

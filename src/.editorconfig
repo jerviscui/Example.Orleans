@@ -129,7 +129,7 @@ csharp_style_prefer_tuple_swap = true
 csharp_style_prefer_utf8_string_literals = true
 csharp_style_throw_expression = true
 csharp_style_unused_value_assignment_preference = discard_variable
-csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
+# csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
 
 # "using" 指令首选项
 csharp_using_directive_placement = outside_namespace
@@ -230,16 +230,57 @@ dotnet_naming_style.begins_with_i.required_suffix =
 dotnet_naming_style.begins_with_i.word_separator =
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
+#### dotnet analyzer ####
+
+dotnet_analyzer_diagnostic.category-Design.severity = warning
+dotnet_analyzer_diagnostic.category-Documentation.severity = warning
+dotnet_analyzer_diagnostic.category-Globalization.severity = warning
+dotnet_analyzer_diagnostic.category-Interoperability.severity = warning
+dotnet_analyzer_diagnostic.category-Maintainability.severity = warning
+dotnet_analyzer_diagnostic.category-Naming.severity = warning
+dotnet_analyzer_diagnostic.category-Performance.severity = warning
+dotnet_analyzer_diagnostic.category-SingleFile.severity = warning
+dotnet_analyzer_diagnostic.category-Reliability.severity = warning
+dotnet_analyzer_diagnostic.category-Security.severity = warning
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+dotnet_analyzer_diagnostic.category-Usage.severity = warning
+
+#### dotnet diagnostic ####
+
+# IDE0161: 转换为文件范围限定的 namespace
+dotnet_diagnostic.IDE0161.severity = none
+
+# IDE0130: 命名空间与文件夹结构不匹配
+dotnet_diagnostic.IDE0130.severity = none
+
+# IDE0290: 使用主构造函数
+dotnet_diagnostic.IDE0290.severity = suggestion
+
+# CS4014: 由于此调用不会等待，因此在调用完成前将继续执行当前方法
+dotnet_diagnostic.CS4014.severity = error
+
+# CS0162: 检测到无法访问的代码
+dotnet_diagnostic.CS0162.severity = error
+
+# IDE0055: 修正格式
+dotnet_diagnostic.IDE0055.severity = suggestion
+
+# IDE2000: 避免出现多个空白行
+dotnet_diagnostic.IDE2000.severity = suggestion
+
+# IDE0007: 使用隐式类型
+dotnet_diagnostic.IDE0007.severity = suggestion
+
+# IDE0052: 删除未读的私有成员
+dotnet_diagnostic.IDE0052.severity = warning
+
+# IDE0060: 删除未使用的参数
+# dotnet_diagnostic.IDE0060.severity = warning
+
+# IDE0058: 永远不会使用表达式值
+# dotnet_diagnostic.IDE0058.severity = warning
+
 #### SonarLint ####
-
-# S125: Sections of code should not be commented out
-dotnet_diagnostic.S125.severity = none
-
-# S1075: URIs should not be hardcoded
-dotnet_diagnostic.S1075.severity = none
-
-# S1135: Track uses of "TODO" tags
-dotnet_diagnostic.S1135.severity = none
 
 # S1186: Methods should not be empty
 dotnet_diagnostic.S1186.severity = error
@@ -250,31 +291,14 @@ dotnet_diagnostic.S2094.severity = error
 # S4487: Unread "private" fields should be removed
 dotnet_diagnostic.S4487.severity = none
 
-#### dotnet analyzer ####
+# S2190: Loops and recursions should not be infinite
+dotnet_diagnostic.S2190.severity = error
 
-dotnet_analyzer_diagnostic.category-Style.severity = warning
+# S125: Sections of code should not be commented out
+dotnet_diagnostic.S125.severity = none
 
-# IDE0060: 删除未使用的参数
-# dotnet_diagnostic.IDE0060.severity = warning
+# S1075: URIs should not be hardcoded
+dotnet_diagnostic.S1075.severity = none
 
-# IDE0035: 删除无法访问的代码
-# dotnet_diagnostic.IDE0035.severity = error
-
-# CS0162: 检测到无法访问的代码
-# dotnet_diagnostic.CS0162.severity = error
-
-# CS4014: 由于此调用不会等待，因此在调用完成前将继续执行当前方法
-# dotnet_diagnostic.CS4014.severity = error
-
-# IDE0052: 删除未读的私有成员
-# dotnet_diagnostic.IDE0052.severity = warning
-
-#
-# IDE0161: 转换为文件范围限定的 namespace
-dotnet_diagnostic.IDE0161.severity = none
-
-# IDE0130: 命名空间与文件夹结构不匹配
-dotnet_diagnostic.IDE0130.severity = none
-
-# IDE0290: 使用主构造函数
-dotnet_diagnostic.IDE0290.severity = suggestion
+# S1135: Track uses of "TODO" tags
+dotnet_diagnostic.S1135.severity = none

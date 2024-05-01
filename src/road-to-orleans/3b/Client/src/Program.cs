@@ -26,7 +26,7 @@ namespace Client
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var siloAdvertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-            var siloGatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000");
+            var siloGatewayPort = int.Parse(Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000", CultureInfo.CurrentCulture);
 
             Console.WriteLine(siloAdvertisedIpAddress);
             Console.WriteLine(siloGatewayPort);
@@ -50,7 +50,7 @@ namespace Client
                         }
                         catch (TaskCanceledException)
                         {
-                            // cancell ignored
+                            // cancel ignored
                         }
 
                         return true;
