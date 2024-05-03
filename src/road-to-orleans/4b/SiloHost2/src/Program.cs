@@ -1,4 +1,4 @@
-﻿using Interfaces;
+using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,23 +10,49 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SiloHost2
 {
+    public interface MyInterface
+    {
+
+
+    }
+
+    public class MyClass2
+    {
+        Task<string> MethodNameAsync(int value, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            var tasks = new List<Task>();
+            for (int i = 0; i < 10; i++)
+                tasks.Add(Task.Delay(100));
+            Task.WaitAll(tasks.ToArray());  // CRR0037
+
+            return Task.FromResult(value.ToString());
+        }
+    }
+
     internal static class Program
     {
         private static Task<int> Run() => Task.FromResult(1);
+        private static Task<int> Run(int i) => Task.FromResult(i);
+        private static Task<int> Run(int i, int y, DateTime dateTime) => Task.FromResult(i);
 
         #region MyRegion
-
+        private static int x;
+        private static int y = 1;
         public static async Task Main()
         {
+            var n = await Run(y);
             _ = await Run();
             var v = await Run();
             _ = GetLocalIpAddress();
@@ -86,9 +112,11 @@ abc:
 
                     _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
                 })
+
                 .ConfigureServices(services =>
                     services.AddOpenTelemetry().WithMetrics(builder =>
                     {
+
                         _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                             .AddService("road4b2", serviceVersion: "1.0.0",
                                 serviceInstanceId: instance, serviceNamespace: clusterId));
@@ -121,6 +149,7 @@ abc:
 
         private static IPAddress GetLocalIpAddress()
         {
+
             var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
             foreach (var network in networkInterfaces)
             {
@@ -128,6 +157,8 @@ abc:
                 {
                     continue;
                 }
+
+
 
                 var properties = network.GetIPProperties();
                 if (properties.GatewayAddresses.Count == 0)
@@ -142,6 +173,14 @@ abc:
             }
 
             throw new NotImplementedException();
+
+
         }
+
+
     }
+
+
 }
+
+
