@@ -24,17 +24,19 @@ namespace SiloHost2
     public interface MyInterface
     {
 
-
     }
 
     public class MyClass2
     {
-        Task<string> MethodNameAsync(int value, CancellationToken token)
+        private Task<string> MethodNameAsync(int value, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var tasks = new List<Task>();
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
+            {
                 tasks.Add(Task.Delay(100));
+            }
+
             Task.WaitAll(tasks.ToArray());  // CRR0037
 
             return Task.FromResult(value.ToString());
@@ -48,10 +50,10 @@ namespace SiloHost2
         private static Task<int> Run(int i, int y, DateTime dateTime) => Task.FromResult(i);
 
         #region MyRegion
-        private static int x;
-        private static int y = 1;
+        private static readonly int X;
+        private static readonly int y = 1;
         public static async Task Main()
-        {
+        {            
             var n = await Run(y);
             _ = await Run();
             var v = await Run();
@@ -158,8 +160,6 @@ abc:
                     continue;
                 }
 
-
-
                 var properties = network.GetIPProperties();
                 if (properties.GatewayAddresses.Count == 0)
                 {
@@ -174,13 +174,7 @@ abc:
 
             throw new NotImplementedException();
 
-
         }
-
-
     }
-
-
 }
-
 
