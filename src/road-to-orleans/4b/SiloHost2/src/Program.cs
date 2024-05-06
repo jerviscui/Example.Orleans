@@ -28,19 +28,29 @@ namespace SiloHost2
 
     public class MyClass2
     {
-        public required string PropertyName { 
-            get; set; }
-        public required string PropertyName2 { 
-            get; 
-            set; }
-        public required object PropertyName3 { get
-                ; set; }
-        public required object PropertyName4 { 
+        public required string PropertyName
+        {
+            get; set;
+        }
+        public required string PropertyName2
+        {
+            get;
+            set;
+        }
+        public required object PropertyName3
+        {
+            get
+                ; set;
+        }
+        public required object PropertyName4
+        {
             get; set
-                ; }
-        public required object PropertyName5 { 
-            get; set; 
-            }
+                ;
+        }
+        public required object PropertyName5
+        {
+            get; set;
+        }
 
         private static Task<string> MethodNameAsync(int value, CancellationToken token)
         {
@@ -69,9 +79,12 @@ namespace SiloHost2
         private static readonly int y = 1;
         public static async Task Main()
         {
-            
+
             var my = new MyClass2() { PropertyName = "", PropertyName2 = string.Empty, PropertyName3 = 3, PropertyName4 = 4, PropertyName5 = 5 };
             var n = await Run(y);
+
+
+            //run
             _ = await Run();
             var v = await Run();
             _ = GetLocalIpAddress();
