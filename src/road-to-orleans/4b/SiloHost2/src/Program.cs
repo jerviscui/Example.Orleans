@@ -28,7 +28,21 @@ namespace SiloHost2
 
     public class MyClass2
     {
-        private Task<string> MethodNameAsync(int value, CancellationToken token)
+        public required string PropertyName { 
+            get; set; }
+        public required string PropertyName2 { 
+            get; 
+            set; }
+        public required object PropertyName3 { get
+                ; set; }
+        public required object PropertyName4 { 
+            get; set
+                ; }
+        public required object PropertyName5 { 
+            get; set; 
+            }
+
+        private static Task<string> MethodNameAsync(int value, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var tasks = new List<Task>();
@@ -48,12 +62,15 @@ namespace SiloHost2
         private static Task<int> Run() => Task.FromResult(1);
         private static Task<int> Run(int i) => Task.FromResult(i);
         private static Task<int> Run(int i, int y, DateTime dateTime) => Task.FromResult(i);
+        public static Task<int> Run2(int i) => Task.FromResult(i);
 
         #region MyRegion
         private static readonly int X;
         private static readonly int y = 1;
         public static async Task Main()
-        {            
+        {
+            
+            var my = new MyClass2() { PropertyName = "", PropertyName2 = string.Empty, PropertyName3 = 3, PropertyName4 = 4, PropertyName5 = 5 };
             var n = await Run(y);
             _ = await Run();
             var v = await Run();
@@ -167,15 +184,22 @@ abc:
                     continue;
                 }
 
-                return properties.UnicastAddresses.Where(o =>
-                        o.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(o.Address))
-                    .Select(o => o.Address)
-                    .First();
+                foreach (var address in properties.UnicastAddresses)
+                {
+                    if (address.Address.AddressFamily == AddressFamily.InterNetwork &&
+                        !IPAddress.IsLoopback(address.Address))
+                    {
+                        return address.Address;
+                    }
+                }
             }
 
             throw new NotImplementedException();
 
         }
+
     }
+
 }
+
 
