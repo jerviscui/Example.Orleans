@@ -23,34 +23,29 @@ namespace SiloHost2
 {
     public interface MyInterface
     {
-
     }
 
     public class MyClass2
     {
-        public required string PropertyName
-        {
-            get; set;
-        }
-        public required string PropertyName2
-        {
-            get;
-            set;
-        }
+        public required string PropertyName { get; set; }
+
+        public required string PropertyName2 { get; set; }
+
         public required object PropertyName3
         {
             get
-                ; set;
+                ;
+            set;
         }
+
         public required object PropertyName4
         {
-            get; set
+            get;
+            set
                 ;
         }
-        public required object PropertyName5
-        {
-            get; set;
-        }
+
+        public required object PropertyName5 { get; set; }
 
         private static Task<string> MethodNameAsync(int value, CancellationToken token)
         {
@@ -70,21 +65,31 @@ namespace SiloHost2
     internal static class Program
     {
         private static Task<int> Run() => Task.FromResult(1);
+
         private static Task<int> Run(int i) => Task.FromResult(i);
+
         private static Task<int> Run(int i, int y, DateTime dateTime) => Task.FromResult(i);
+
         public static Task<int> Run2(int i) => Task.FromResult(i);
 
         #region MyRegion
+
         private static readonly int X;
         private static readonly int y = 1;
+
         public static async Task Main()
         {
-
-            var my = new MyClass2() { PropertyName = "", PropertyName2 = string.Empty, PropertyName3 = 3, PropertyName4 = 4, PropertyName5 = 5 };
+            var my = new MyClass2()
+            {
+                PropertyName = "",
+                PropertyName2 = string.Empty,
+                PropertyName3 = 3,
+                PropertyName4 = 4,
+                PropertyName5 = 5
+            };
             var n = await Run(y);
 
-
-            //run
+            // run
             _ = await Run();
             var v = await Run();
             _ = GetLocalIpAddress();
@@ -100,7 +105,7 @@ abc:
             var arr = new int[] { 1 };
             arr[1] = 1;
 
-            //goto abc;
+            // goto abc;
 
             var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
             var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
@@ -124,7 +129,6 @@ abc:
                     {
                         dashboardOptions.CounterUpdateIntervalMs = 10_000;
                         dashboardOptions.Port = 28080;
-
                     });
 
                     _ = siloBuilder.UseRedisClustering(options => options.ConfigurationOptions = redisConfig);
@@ -142,16 +146,17 @@ abc:
                         endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
                     });
 
-                    _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
+                    _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options =>
+                        options.ConfigurationOptions = redisConfig);
                 })
 
                 .ConfigureServices(services =>
-                    services.AddOpenTelemetry().WithMetrics(builder =>
+                    services.AddOpenTelemetry()
+                    .WithMetrics(builder =>
                     {
-
                         _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                            .AddService("road4b2", serviceVersion: "1.0.0",
-                                serviceInstanceId: instance, serviceNamespace: clusterId));
+                            .AddService("road4b2", serviceVersion: "1.0.0", serviceInstanceId: instance,
+                                serviceNamespace: clusterId));
 
                         _ = builder.AddMeter("Microsoft.Orleans");
 
@@ -162,7 +167,7 @@ abc:
                             exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
                             metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds =
                                 5_000; // default 60s
-                            //metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
+                            // metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
                         });
                     }))
                 .ConfigureLogging(logging => logging.AddConsole())
@@ -177,12 +182,11 @@ abc:
 
             await host.WaitForShutdownAsync();
         }
+
         #endregion
 
         private static IPAddress GetLocalIpAddress()
         {
-
-
             var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
             foreach (var network in networkInterfaces)
             {
@@ -208,11 +212,7 @@ abc:
             }
 
             throw new NotImplementedException();
-
         }
-
     }
-
 }
-
 
