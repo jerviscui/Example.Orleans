@@ -21,6 +21,9 @@ using System.Threading.Tasks;
 
 namespace SiloHost2
 {
+    using System.IO;
+    using System.Threading.Tasks;
+
     public interface MyInterface
     {
 
@@ -28,22 +31,43 @@ namespace SiloHost2
 
     public class MyClass2
     {
-        public required string PropertyName { 
-            get; set; }
-        public required string PropertyName2 { 
-            get; 
-            set; }
-        public required object PropertyName3 { get
-                ; set; }
-        public required object PropertyName4 { 
+        public required string PropertyName
+        {
+            get; set;
+        }
+        public required string PropertyName2
+        {
+            get;
+            set;
+        }
+        public required object PropertyName3
+        {
+            get
+                ; set;
+        }
+        public required object PropertyName4
+        {
             get; set
-                ; }
-        public required object PropertyName5 { 
-            get; set; 
-            }
+                ;
+        }
+        public required object PropertyName5
+        {
+            get; set;
+        }
 
+        private static readonly int[] sourceArray = new[] { 1, 2, 3 };
         private static Task<string> MethodNameAsync(int value, CancellationToken token)
         {
+            //ide0063 csharp_prefer_simple_using_statement
+            using (var fileStream = new FileStream("", FileMode.Create))
+            {
+                _ = fileStream.CanSeek;
+            }
+
+            // Code with violations. IDE0200 csharp_style_prefer_method_group_conversion
+            bool IsEven(int x) => x % 2 == 0;
+            _ = sourceArray.Where(n => IsEven(n));
+
             token.ThrowIfCancellationRequested();
             var tasks = new List<Task>();
             for (var i = 0; i < 10; i++)
@@ -65,11 +89,17 @@ namespace SiloHost2
         public static Task<int> Run2(int i) => Task.FromResult(i);
 
         #region MyRegion
-        private static readonly int X;
-        private static readonly int y = 1;
+        private readonly static int X;
+        static readonly int y = 1;
         public static async Task Main()
         {
-            
+
+            using (var fileStream = new FileStream("", FileMode.Create))
+            {
+                _ = fileStream.CanSeek;
+            }
+
+
             var my = new MyClass2() { PropertyName = "", PropertyName2 = string.Empty, PropertyName3 = 3, PropertyName4 = 4, PropertyName5 = 5 };
             var n = await Run(y);
             _ = await Run();
