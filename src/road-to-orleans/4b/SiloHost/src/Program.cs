@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
@@ -18,48 +18,8 @@ using System.Threading.Tasks;
 
 namespace SiloHost;
 
-internal class MyClass
-{
-    protected MyClass()
-    {
-
-    }
-}
-#region B
-internal class MyClassB : MyClass, IDisposable
-{
-    private void ReleaseUnmanagedResources() => throw new NotSupportedException();
-
-    protected virtual void Dispose(bool disposing) => ReleaseUnmanagedResources();
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    ~MyClassB() => Dispose(false);
-}
-#endregion
-
 internal class Program
 {
-    public void Test() => throw new NotSupportedException();
-    #region BBB
-    private static void MethodName() => throw new NotSupportedException();
-
-    public void MethodName3()
-    {
-        MethodName();
-        myVarb = 1;
-        Console.WriteLine(MyProperty);
-    }
-
-    #endregion
-    private int myVarb;
-
-    public int MyProperty { get; set; }
-
     public static async Task Main()
     {
 
