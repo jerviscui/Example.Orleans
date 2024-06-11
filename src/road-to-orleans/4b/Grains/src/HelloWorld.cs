@@ -1,31 +1,37 @@
-﻿using System;
-using System.Threading.Tasks;
 using Interfaces;
 using Orleans;
+using System;
+using System.Threading.Tasks;
 
-namespace Grains
+namespace Grains;
+
+public class HelloWorld : Grain, IHelloWorld
 {
-    public class HelloWorld : Grain, IHelloWorld
+#pragma warning disable IDE0052 // Remove unread private members
+    private readonly IClusterClient _client;
+#pragma warning restore IDE0052 // Remove unread private members
+    private readonly IGrainFactory _grainFactory;
+
+    public HelloWorld(IGrainFactory grainFactory, IClusterClient client)
     {
-        private readonly IGrainFactory _grainFactory;
-
-        private readonly IClusterClient _client;
-
-        public HelloWorld(IGrainFactory grainFactory, IClusterClient client)
-        {
-            _grainFactory = grainFactory;
-            _client = client;
-        }
-
-        public async Task<string> SayHello(string name)
-        {
-            await Task.Delay(Random.Shared.Next(10, 50));
-
-            var result = await _grainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong()).SayInternal(name);
-            // or
-            //var result = await _client.GetGrain<IInterGrain>(this.GetPrimaryKeyLong()).SayInternal(name);
-
-            return $"Hello {name}!\n{result}";
-        }
+        _grainFactory = grainFactory;
+        _client = client;
     }
+
+    #region IHelloWorld implementations
+
+    public async Task<string> SayHelloAsync(string name, GrainCancellationToken? cancellationToken = null)
+    {
+        await Task.Delay(Random.Shared.Next(10, 50), cancellationToken?.CancellationToken ?? default);
+
+        var result = await _grainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong())
+            .SayInternalAsync(name, cancellationToken);
+        // or
+        // var result = await _client.GetGrain<IInterGrain>(this.GetPrimaryKeyLong()).SayInternalAsync(name);
+
+        return $"Hello {name}!\n{result}";
+    }
+
+    #endregion
+
 }

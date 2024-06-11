@@ -11,9 +11,11 @@ using Orleans.Hosting;
 using StackExchange.Redis;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SiloHost2;
@@ -39,14 +41,10 @@ internal static class Program
                 continue;
             }
 
-            foreach (var address in properties.UnicastAddresses)
-            {
-                if (address.Address.AddressFamily == AddressFamily.InterNetwork &&
-                    !IPAddress.IsLoopback(address.Address))
-                {
-                    return address.Address;
-                }
-            }
+            return properties.UnicastAddresses
+                .Where(o => o.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(o.Address))
+                .Select(o => o.Address)
+                .First();
         }
 
         throw new NotImplementedException();
@@ -122,13 +120,14 @@ internal static class Program
             .UseConsoleLifetime()
             .Build();
 
-        await host.StartAsync();
+        await host.StartAsync(CancellationToken.None);
 
         var factory = host.Services.GetRequiredService<IGrainFactory>();
         var grain = factory.GetGrain<IInterGrain>(0);
-        Console.WriteLine(await grain.SayInternal("Server2"));
 
-        await host.WaitForShutdownAsync();
+        Console.WriteLine(await grain.SayInternalAsync("Server2"));
+
+        await host.WaitForShutdownAsync(CancellationToken.None);
     }
 
     #endregion

@@ -1,10 +1,18 @@
-﻿using System.Threading.Tasks;
 using Orleans;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Interfaces
+namespace Interfaces;
+
+[Alias("Interfaces.IHelloWorld")]
+public interface IHelloWorld : IGrainWithIntegerKey
 {
-    public interface IHelloWorld : IGrainWithIntegerKey
-    {
-        Task<string> SayHello(string name);
-    }
+
+    #region Methods
+
+    [Alias("SayHello")]
+    Task<string> SayHelloAsync(string name, GrainCancellationToken? cancellationToken = null);
+
+    #endregion
+
 }

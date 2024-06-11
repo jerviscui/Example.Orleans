@@ -1,63 +1,60 @@
-﻿using System.Threading.Tasks;
+using Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MyNamespace;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using StackExchange.Redis;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Client
-{
-    internal class Program
+var factory = LoggerFactory.Create(builder => builder.AddConsole());
+var logger = factory.CreateLogger<Program>();
+
+var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
+
+await Host.CreateDefaultBuilder(args)
+    .UseOrleansClient(clientBuilder =>
     {
-        protected Program()
+        _ = clientBuilder.UseRedisClustering(options =>
         {
-        }
-
-        private static async Task Main(string[] args)
+            options.ConfigurationOptions = redisConfig;
+        });
+        _ = clientBuilder.Configure<ClusterOptions>(options =>
         {
-            var factory = LoggerFactory.Create(builder => builder.AddConsole());
-            var logger = factory.CreateLogger<Program>();
+            options.ClusterId = "dev";
+            options.ServiceId = "road4b";
+        });
 
-            var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
+        _ = clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
+        {
+            logger.ConnectionFailed();
 
-            await Host.CreateDefaultBuilder(args)
-                .UseOrleansClient(clientBuilder =>
-                {
-                    clientBuilder.UseRedisClustering(options => { options.ConfigurationOptions = redisConfig; });
-                    clientBuilder.Configure<ClusterOptions>(options =>
-                    {
-                        options.ClusterId = "dev";
-                        options.ServiceId = "road4b";
-                    });
+            try
+            {
+                await Task.Delay(5_000, token);
+            }
+            catch (TaskCanceledException)
+            {
+                // cancellation ignored
+            }
 
-                    clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
-                    {
-                        logger.LogError(exception, "Connection Retry");
-                        try
-                        {
-                            await Task.Delay(5_000, token);
-                        }
-                        catch (TaskCanceledException)
-                        {
-                            // cancell ignored
-                        }
+            return true;
+        });
+    })
+    .ConfigureServices(services =>
+    {
+        _ = services.AddHostedService<HelloWorldClientHostedService>();
 
-                        return true;
-                    });
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddHostedService<HelloWorldClientHostedService>();
-
-                    services.Configure<ConsoleLifetimeOptions>(options => { options.SuppressStatusMessages = true; });
-                })
-                .ConfigureLogging(builder =>
-                {
-                    builder.SetMinimumLevel(LogLevel.Information);
-                    builder.AddConsole();
-                })
-                .RunConsoleAsync();
-        }
-    }
-}
+        _ = services.Configure<ConsoleLifetimeOptions>(options =>
+        {
+            options.SuppressStatusMessages = true;
+        });
+    })
+    .ConfigureLogging(builder =>
+    {
+        _ = builder.SetMinimumLevel(LogLevel.Information);
+        _ = builder.AddConsole();
+    })
+    .RunConsoleAsync(CancellationToken.None);

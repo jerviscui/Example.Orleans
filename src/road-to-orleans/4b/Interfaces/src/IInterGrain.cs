@@ -1,10 +1,17 @@
-﻿using System.Threading.Tasks;
 using Orleans;
+using System.Threading.Tasks;
 
-namespace Interfaces
+namespace Interfaces;
+
+[Alias("Interfaces.IInterGrain")]
+public interface IInterGrain : IGrainWithIntegerKey
 {
-    public interface IInterGrain : IGrainWithIntegerKey
-    {
-        Task<string> SayInternal(string name);
-    }
+
+    #region Methods
+
+    [Alias("SayInternal")]
+    public Task<string> SayInternalAsync(string name, GrainCancellationToken? cancellationToken = null);
+
+    #endregion
+
 }
