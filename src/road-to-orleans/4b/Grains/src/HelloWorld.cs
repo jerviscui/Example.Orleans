@@ -1,3 +1,4 @@
+using Common;
 using Interfaces;
 using Orleans;
 using System;
@@ -22,12 +23,12 @@ public class HelloWorld : Grain, IHelloWorld
 
     public async Task<string> SayHelloAsync(string name, GrainCancellationToken? cancellationToken = null)
     {
-        await Task.Delay(Random.Shared.Next(10, 50), cancellationToken?.CancellationToken ?? default);
+        await Task.Delay(Random.Shared.Next(10, 50), cancellationToken.GetCancellationToken());
 
         var result = await _grainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong())
             .SayInternalAsync(name, cancellationToken);
         // or
-        // var result = await _client.GetGrain<IInterGrain>(this.GetPrimaryKeyLong()).SayInternalAsync(name);
+        // var result = await _client.GetGrain<IInterGrain>(this.GetPrimaryKeyLong()).SayInternalAsync(name, cancellationToken);
 
         return $"Hello {name}!\n{result}";
     }

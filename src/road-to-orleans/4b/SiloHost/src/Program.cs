@@ -1,3 +1,4 @@
+using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace SiloHost;
 
-internal class Program
+internal sealed class Program //todo: S1118
 {
 
     #region Constants & Statics
@@ -116,9 +117,9 @@ internal class Program
 
         await host.StartAsync(CancellationToken.None);
 
-        // var factory = host.Services.GetRequiredService<IGrainFactory>();
-        // var grain = factory.GetGrain<IHelloWorld>(0);
-        // Console.WriteLine(await grain.SayHelloAsync("Server"));
+        var factory = host.Services.GetRequiredService<IGrainFactory>();
+        var grain = factory.GetGrain<IHelloWorld>(0);
+        Console.WriteLine(await grain.SayHelloAsync("Server"));
 
         await host.WaitForShutdownAsync(CancellationToken.None);
     }

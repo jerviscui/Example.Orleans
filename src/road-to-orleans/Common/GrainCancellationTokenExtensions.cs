@@ -1,14 +1,16 @@
-﻿using Orleans;
-using System.Threading;
+using Orleans;
 
-namespace SiloHost2;
+namespace Common;
 
 public static class GrainCancellationTokenExtensions
 {
 
     #region Constants & Statics
 
-    public static CancellationToken MethodName(this GrainCancellationToken cancellationToken)
+    /// <summary>
+    /// Gets CancellationToken or None.
+    /// </summary>
+    public static CancellationToken GetCancellationToken(this GrainCancellationToken? cancellationToken)
     {
         return cancellationToken?.CancellationToken ?? CancellationToken.None;
     }

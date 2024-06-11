@@ -28,11 +28,14 @@ public class HelloWorldClientHostedService : IHostedService
                 {
                     var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(1, 20));
 
+                    var cts = new GrainCancellationTokenSource();
+                    _ = cancellationToken.Register(async () => await cts.Cancel()); //bug: async lambda
+
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         try
                         {
-                            Console.WriteLine($"{await helloWorldGrain.SayHelloAsync("Piotr", cancellationToken)}");
+                            Console.WriteLine($"{await helloWorldGrain.SayHelloAsync("Piotr", cts.Token)}");
                         }
                         catch
                         {
