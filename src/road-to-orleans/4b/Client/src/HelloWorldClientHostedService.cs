@@ -50,21 +50,9 @@ public class HelloWorldClientHostedService : IHostedService
                         }
 
                         await Task.Delay(1_000, cancellationToken);
-
-                        // bug: throw will be crash?
-                        throw new NotSupportedException("test task crash");
                     }
                 },
                 cancellationToken);
-        // .ContinueWith(
-        // (t) =>
-        // {
-        // if (t.IsFaulted)
-        // {
-        // Console.WriteLine(t.Exception?.Message);
-        // }
-        // },
-        // cancellationToken);
 
         return Task.CompletedTask;
     }

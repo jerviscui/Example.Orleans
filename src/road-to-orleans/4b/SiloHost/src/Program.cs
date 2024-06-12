@@ -123,7 +123,21 @@ internal static class Program
 
         var factory = host.Services.GetRequiredService<IGrainFactory>();
         var grain = factory.GetGrain<IHelloWorld>(0);
-        Console.WriteLine(await grain.SayHelloAsync("Server"));
+
+        await grain.SayHelloAsync("Server")
+            .ContinueWith((t) =>
+            {
+                Console.WriteLine("SiloHost start run:");
+
+                if (t.IsCompletedSuccessfully)
+                {
+                    Console.WriteLine(t.Result);
+                }
+                else
+                {
+                    Console.WriteLine(t.Exception?.Message);
+                }
+            });
 
         await host.WaitForShutdownAsync(CancellationToken.None);
     }

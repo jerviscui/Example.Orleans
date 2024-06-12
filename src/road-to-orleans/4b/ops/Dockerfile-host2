@@ -21,6 +21,7 @@ RUN dotnet restore "/src/Client/Client.csproj"
 
 COPY ./SiloHost2/src/* /src/SiloHost2/src/
 COPY ./Interfaces/src/* /src/Interfaces/src/
+COPY ./Interfaces/*.cs /src/Interfaces/
 RUN dotnet build "/src/SiloHost2/SiloHost2.csproj" -c Release
 
 FROM build AS publish
