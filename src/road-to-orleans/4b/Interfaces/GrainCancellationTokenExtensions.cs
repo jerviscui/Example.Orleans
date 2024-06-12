@@ -1,6 +1,7 @@
 using Orleans;
+using System.Threading;
 
-namespace Common;
+namespace Interfaces;
 
 public static class GrainCancellationTokenExtensions
 {

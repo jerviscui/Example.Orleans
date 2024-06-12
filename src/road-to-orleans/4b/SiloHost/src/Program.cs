@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace SiloHost;
 
-internal sealed class Program //todo: S1118
+internal static class Program
 {
 
     #region Constants & Statics
@@ -65,7 +65,11 @@ internal sealed class Program //todo: S1118
         instance += $":{extractedSiloPort}";
 
         var clusterId = "dev";
+#if DEBUG
+        var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=7,allowAdmin=true");
+#else
         var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
+#endif
 
         var host = new HostBuilder()
             .UseOrleans(siloBuilder =>

@@ -29,7 +29,14 @@ public class HelloWorldClientHostedService : IHostedService
                     var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(1, 20));
 
                     var cts = new GrainCancellationTokenSource();
-                    _ = cancellationToken.Register(async () => await cts.Cancel()); //bug: async lambda
+                    _ = cancellationToken.Register(() => cts.Cancel()
+                        .ContinueWith((t) =>
+                        {
+                            if (t.IsFaulted)
+                            {
+                                Console.WriteLine(t.Exception.Message);
+                            }
+                        }));
 
                     while (!cancellationToken.IsCancellationRequested)
                     {
@@ -48,16 +55,16 @@ public class HelloWorldClientHostedService : IHostedService
                         throw new NotSupportedException("test task crash");
                     }
                 },
-                cancellationToken)
-            .ContinueWith(
-                (t) =>
-                {
-                    if (t.IsFaulted)
-                    {
-                        Console.WriteLine(t.Exception?.Message);
-                    }
-                },
                 cancellationToken);
+        // .ContinueWith(
+        // (t) =>
+        // {
+        // if (t.IsFaulted)
+        // {
+        // Console.WriteLine(t.Exception?.Message);
+        // }
+        // },
+        // cancellationToken);
 
         return Task.CompletedTask;
     }

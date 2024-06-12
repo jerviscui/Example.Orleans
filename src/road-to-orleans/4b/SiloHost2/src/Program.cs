@@ -65,7 +65,11 @@ internal static class Program
         var instance = Environment.GetEnvironmentVariable(variable: "HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
+#if DEBUG
+        var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=7,allowAdmin=true");
+#else
         var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
+#endif
 
         var host = new HostBuilder()
             .UseOrleans(siloBuilder =>
