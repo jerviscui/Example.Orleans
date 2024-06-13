@@ -34,7 +34,7 @@ public class HelloWorldClientHostedService : IHostedService
                     {
                         if (t.IsFaulted)
                         {
-                            Console.WriteLine(t.Exception.Message);
+                            Console.WriteLine(t.Exception.Message);//bug: no have cs8602, 测试命中效果
                         }
                     }));
 
