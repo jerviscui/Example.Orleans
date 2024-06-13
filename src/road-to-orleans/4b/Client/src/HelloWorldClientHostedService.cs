@@ -22,37 +22,38 @@ public class HelloWorldClientHostedService : IHostedService
     {
         Console.WriteLine("Run HostedService.");
 
-        _ = Task
-            .Run(
-                async () =>
-                {
-                    var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(1, 20));
+        _ = Task.Run(
+            async () =>
+            {
+                var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(1, 20));
 
-                    var cts = new GrainCancellationTokenSource();
-                    _ = cancellationToken.Register(() => cts.Cancel()
-                        .ContinueWith((t) =>
-                        {
-                            if (t.IsFaulted)
-                            {
-                                Console.WriteLine(t.Exception.Message);
-                            }
-                        }));
-
-                    while (!cancellationToken.IsCancellationRequested)
+                // fixme: add to template
+                var cts = new GrainCancellationTokenSource();
+                _ = cancellationToken.Register(() => cts.Cancel()
+                    .ContinueWith((t) =>
                     {
-                        try
+                        if (t.IsFaulted)
                         {
-                            Console.WriteLine($"{await helloWorldGrain.SayHelloAsync("Piotr", cts.Token)}");
+                            Console.WriteLine(t.Exception.Message);
                         }
-                        catch
-                        {
-                            // ignore
-                        }
+                    }));
 
-                        await Task.Delay(1_000, cancellationToken);
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        // fixme: test GrainCancellationTokenSource
+                        Console.WriteLine($"{await helloWorldGrain.SayHelloAsync("Piotr", cts.Token)}");
                     }
-                },
-                cancellationToken);
+                    catch
+                    {
+                        // ignore
+                    }
+
+                    await Task.Delay(1_000, cancellationToken);
+                }
+            },
+            cancellationToken);
 
         return Task.CompletedTask;
     }
