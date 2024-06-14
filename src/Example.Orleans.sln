@@ -40,12 +40,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4b", "4b", "{FA6E52D7-22F4-4BFB-8CB4-481B53A00A8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "road-to-orleans\4b\Client\Client.csproj", "{84E602DD-4468-4E4C-AAB1-8315FA3D1B1D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{53382375-920D-49C1-A9CB-CCCCD4A3E0EC} = {53382375-920D-49C1-A9CB-CCCCD4A3E0EC}
+		{C1E86B33-95B5-4AED-A7A4-23EAD5A5C496} = {C1E86B33-95B5-4AED-A7A4-23EAD5A5C496}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Grains", "road-to-orleans\4b\Grains\Grains.csproj", "{86350CC3-B344-44CC-AF03-D040938C0AD9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interfaces", "road-to-orleans\4b\Interfaces\Interfaces.csproj", "{12D0508A-4B49-4413-BA26-615966805D04}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SiloHost", "road-to-orleans\4b\SiloHost\SiloHost.csproj", "{C1E86B33-95B5-4AED-A7A4-23EAD5A5C496}"
+	ProjectSection(ProjectDependencies) = postProject
+		{53382375-920D-49C1-A9CB-CCCCD4A3E0EC} = {53382375-920D-49C1-A9CB-CCCCD4A3E0EC}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SiloHost2", "road-to-orleans\4b\SiloHost2\SiloHost2.csproj", "{53382375-920D-49C1-A9CB-CCCCD4A3E0EC}"
 EndProject

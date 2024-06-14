@@ -20,14 +20,23 @@ public class HelloWorld : Grain, IHelloWorld
 
     #region IHelloWorld implementations
 
-    public async Task<string> SayHelloAsync(string name, GrainCancellationToken? cancellationToken = null)
+    public async Task<string> SayHelloAsync(string name, GrainCancellationToken? token = null)
     {
-        await Task.Delay(Random.Shared.Next(10, 50), cancellationToken.GetCancellationToken());
+        token?.CancellationToken.ThrowIfCancellationRequested();
+        var interGrain = _grainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong());
 
-        var result = await _grainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong())
-            .SayInternalAsync(name, cancellationToken);
-        // or
-        // var result = await _client.GetGrain<IInterGrain>(this.GetPrimaryKeyLong()).SayInternalAsync(name, cancellationToken);
+        string result;
+        try
+        {
+            result = await interGrain.SayInternalAsync(name, token);
+            // or
+            // var result = await _client.GetGrain<IInterGrain>(this.GetPrimaryKeyLong()).SayInternalAsync(name, token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SayInternalAsync error: {ex.Message}");
+            throw;
+        }
 
         return $"Hello {name}!\n{result}";
     }

@@ -1,5 +1,4 @@
 using Orleans;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Interfaces;
@@ -11,7 +10,7 @@ public interface IHelloWorld : IGrainWithIntegerKey
     #region Methods
 
     [Alias("SayHello")]
-    Task<string> SayHelloAsync(string name, GrainCancellationToken? cancellationToken = null);
+    Task<string> SayHelloAsync(string name, GrainCancellationToken? token = null);
 
     #endregion
 

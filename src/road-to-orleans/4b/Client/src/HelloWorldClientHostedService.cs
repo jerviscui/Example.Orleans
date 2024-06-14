@@ -25,32 +25,35 @@ public class HelloWorldClientHostedService : IHostedService
         _ = Task.Run(
             async () =>
             {
-                var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(1, 20));
-
-                // fixme: add to template
-                var cts = new GrainCancellationTokenSource();
-                _ = cancellationToken.Register(() => cts.Cancel()
-                    .ContinueWith((t) =>
-                    {
-                        if (t.IsFaulted)
-                        {
-                            Console.WriteLine(t.Exception.Message);//bug: no have cs8602, 测试命中效果
-                        }
-                    }));
-
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     try
                     {
+                        using var cts = new CancellationTokenSource(3_000);
+
+                        // fixme: add to template
+                        using var gcts = new GrainCancellationTokenSource();
+                        using var reg = gcts.RegisterTo(
+                            cts.Token,
+                            (t) =>
+                            {
+                                if (t.IsFaulted)
+                                {
+                                    Console.WriteLine($"gcts Cancel error: {t.Exception.Message}");
+                                }
+                            });
+
+                        // var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(30, 40));
+                        var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(0);
                         // fixme: test GrainCancellationTokenSource
-                        Console.WriteLine($"{await helloWorldGrain.SayHelloAsync("Piotr", cts.Token)}");
+                        Console.WriteLine($"{await helloWorldGrain.SayHelloAsync("Piotr", gcts.Token)}");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // ignore
+                        Console.WriteLine($"SayHelloAsync error: {ex.Message}");
                     }
 
-                    await Task.Delay(1_000, cancellationToken);
+                    await Task.Delay(10_000, cancellationToken);
                 }
             },
             cancellationToken);
