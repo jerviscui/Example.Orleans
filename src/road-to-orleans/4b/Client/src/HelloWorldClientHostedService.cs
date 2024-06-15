@@ -2,6 +2,7 @@ using Interfaces;
 using Microsoft.Extensions.Hosting;
 using Orleans;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,13 +28,16 @@ public class HelloWorldClientHostedService : IHostedService
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
+                    var key = Random.Shared.Next(30, 40);
+                    var stopwatch = Stopwatch.StartNew();
+
                     try
                     {
-                        using var cts = new CancellationTokenSource(3_000);
+                        using var cts = new CancellationTokenSource(500);
+                        Console.WriteLine($"1: {stopwatch.ElapsedMilliseconds}");
 
-                        // fixme: add to template
                         using var gcts = new GrainCancellationTokenSource();
-                        using var reg = gcts.RegisterTo(
+                        using var registration = gcts.RegisterTo(
                             cts.Token,
                             (t) =>
                             {
@@ -43,17 +47,25 @@ public class HelloWorldClientHostedService : IHostedService
                                 }
                             });
 
-                        // var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(Random.Shared.Next(30, 40));
-                        var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(0);
-                        // fixme: test GrainCancellationTokenSource
+                        Console.WriteLine($"2: {stopwatch.ElapsedMilliseconds}");
+                        Console.WriteLine($"2: {DateTime.Now:HH:mm:ss.fff}");
+
+                        var helloWorldGrain = _clusterClient.GetGrain<IHelloWorld>(key);
+
                         Console.WriteLine($"{await helloWorldGrain.SayHelloAsync("Piotr", gcts.Token)}");
+                    }
+                    catch (OperationCanceledException ex)
+                    {
+                        Console.WriteLine($"SayHelloAsync Canceled: {ex.Message}");
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"SayHelloAsync error: {ex.Message}");
                     }
 
-                    await Task.Delay(10_000, cancellationToken);
+                    Console.WriteLine($"3: {stopwatch.ElapsedMilliseconds}");
+
+                    await Task.Delay(3_000, cancellationToken);
                 }
             },
             cancellationToken);

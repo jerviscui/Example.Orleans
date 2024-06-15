@@ -61,14 +61,16 @@ internal static class Program
         var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "40000";
         var gatewayPort = int.Parse(extractedGatewayPort, CultureInfo.CurrentCulture);
 
-        var clusterId = "dev";
         var instance = Environment.GetEnvironmentVariable(variable: "HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
+        var clusterId = "dev";
 #if DEBUG
-        var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=7,allowAdmin=true");
+        var domain = "localhost";
+        var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=7,allowAdmin=true");
 #else
-        var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
+        var domain = "host.docker.internal";
+        var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=6,allowAdmin=true");
 #endif
 
         var host = new HostBuilder()
@@ -112,11 +114,9 @@ internal static class Program
 
                     _ = builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
                     {
-                        exporterOptions.Endpoint =
-                            new Uri("http://host.docker.internal:9090/api/v1/otlp/v1/metrics");
+                        exporterOptions.Endpoint = new Uri($"http://{domain}:9090/api/v1/otlp/v1/metrics");
                         exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds =
-                            5_000; // default 60s
+                        metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000; // default 60s
                         // metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
                     });
                 }))

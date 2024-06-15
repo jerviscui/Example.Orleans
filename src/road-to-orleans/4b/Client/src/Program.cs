@@ -13,9 +13,9 @@ var factory = LoggerFactory.Create(builder => builder.AddConsole());
 var logger = factory.CreateLogger<Program>();
 
 #if DEBUG
-var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=7,allowAdmin=true");
+var redisConfig = ConfigurationOptions.Parse("localhost:6379,DefaultDatabase=7,allowAdmin=true");
 #else
-        var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
+var redisConfig = ConfigurationOptions.Parse("host.docker.internal:6379,DefaultDatabase=6,allowAdmin=true");
 #endif
 
 await Host.CreateDefaultBuilder(args)
