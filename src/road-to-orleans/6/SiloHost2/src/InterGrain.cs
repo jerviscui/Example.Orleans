@@ -13,16 +13,12 @@ public class InterGrain : Grain, IInterGrain
     /// <inheritdoc />
     public async Task<string> SayInternalAsync(string name, GrainCancellationToken? token = null)
     {
-        Console.WriteLine($"2: {DateTime.Now:HH:mm:ss.fff}");
-
         try
         {
-            await Task.Delay(1_000, token.GetCancellationToken());
+            await Task.Delay(500, token.GetCancellationToken());
         }
         catch (TaskCanceledException ex)
         {
-            Console.WriteLine($"3: {DateTime.Now:HH:mm:ss.fff}");
-
             Console.WriteLine($"Canceled: {ex.Message}");
             throw;
         }

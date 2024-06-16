@@ -22,8 +22,6 @@ public class HelloWorld : Grain, IHelloWorld
 
     public async Task<string> SayHelloAsync(string name, GrainCancellationToken? token = null)
     {
-        Console.WriteLine($"2: {DateTime.Now:HH:mm:ss.fff}");
-
         token?.CancellationToken.ThrowIfCancellationRequested();
         var interGrain = _grainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong());
 
@@ -36,8 +34,6 @@ public class HelloWorld : Grain, IHelloWorld
         }
         catch (OperationCanceledException ex)
         {
-            Console.WriteLine($"3: {DateTime.Now:HH:mm:ss.fff}");
-
             Console.WriteLine($"SayInternalAsync Canceled: {ex.Message}");
             throw;
         }
