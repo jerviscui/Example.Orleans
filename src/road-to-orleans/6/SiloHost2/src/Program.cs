@@ -18,7 +18,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SiloHost;
+namespace SiloHost2;
 
 internal static class Program
 {
@@ -55,17 +55,16 @@ internal static class Program
         var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
         var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-        var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "11111";
+        var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "21111";
         var siloPort = int.Parse(extractedSiloPort, CultureInfo.CurrentCulture);
 
-        var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000";
+        var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "40000";
         var gatewayPort = int.Parse(extractedGatewayPort, CultureInfo.CurrentCulture);
 
-        var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
+        var instance = Environment.GetEnvironmentVariable(variable: "HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
         var clusterId = "dev";
-
 #if DEBUG
         var domain = "localhost";
         var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=7,allowAdmin=true");
@@ -77,7 +76,11 @@ internal static class Program
         var host = new HostBuilder()
             .UseOrleans(siloBuilder =>
             {
-                _ = siloBuilder.UseDashboard(dashboardOptions => dashboardOptions.CounterUpdateIntervalMs = 10_000);
+                _ = siloBuilder.UseDashboard(dashboardOptions =>
+                {
+                    dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                    dashboardOptions.Port = 28080;
+                });
 
                 _ = siloBuilder.UseRedisClustering(options => options.ConfigurationOptions = redisConfig);
                 _ = siloBuilder.Configure<ClusterOptions>(options =>
@@ -96,12 +99,13 @@ internal static class Program
 
                 _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
             })
+
             .ConfigureServices(services => services.AddOpenTelemetry()
                 .WithMetrics(builder =>
                 {
                     _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                         .AddService(
-                            "road4b",
+                            "road4b2",
                             serviceVersion: "1.0.0",
                             serviceInstanceId: instance,
                             serviceNamespace: clusterId));
@@ -123,12 +127,12 @@ internal static class Program
         await host.StartAsync(CancellationToken.None);
 
         var factory = host.Services.GetRequiredService<IGrainFactory>();
-        var grain = factory.GetGrain<IHelloWorld>(0);
+        var grain = factory.GetGrain<IInterGrain>(0);
 
-        await grain.SayHelloAsync("Server")
+        await grain.SayInternalAsync("Server2")
             .ContinueWith((t) =>
             {
-                Console.WriteLine("SiloHost start run:");
+                Console.WriteLine("SiloHost2 start run:");
 
                 if (t.IsCompletedSuccessfully)
                 {
