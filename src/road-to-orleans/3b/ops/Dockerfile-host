@@ -19,7 +19,7 @@ RUN dotnet restore "/src/Client/Client.csproj"
 COPY ./SiloHost/src/* /src/SiloHost/src/
 COPY ./Grains/src/* /src/Grains/src/
 COPY ./Interfaces/src/* /src/Interfaces/src/
-COPY ./Client/src/* /src/Client/
+COPY ./Client/src/* /src/Client/src/
 RUN dotnet build "/src/SiloHost/SiloHost.csproj" -c Release
 RUN dotnet build "/src/Client/Client.csproj" -c Release
 

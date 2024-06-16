@@ -22,7 +22,7 @@ RUN dotnet restore "/src/Client/Client.csproj"
 COPY ./Grains/src/* /src/Grains/src/
 COPY ./Interfaces/src/* /src/Interfaces/src/
 COPY ./Interfaces/*.cs /src/Interfaces/
-COPY ./Client/src/* /src/Client/
+COPY ./Client/src/* /src/Client/src/
 RUN dotnet build "/src/Client/Client.csproj" -c Release
 
 FROM build AS publish
