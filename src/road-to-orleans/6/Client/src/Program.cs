@@ -41,7 +41,7 @@ await Host.CreateDefaultBuilder(args)
             }
             catch (TaskCanceledException)
             {
-                // cancellation ignored
+                return false;
             }
 
             return true;

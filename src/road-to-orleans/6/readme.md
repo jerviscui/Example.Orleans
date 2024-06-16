@@ -1,6 +1,6 @@
 # readme
 
-Run with Redis Cluster.
-Cluster with 3 SiloHost and 1 SiloHost2.
+This example builds on top of solution 4b.
 
-Use GrainCancellationToken
+Use the Web Api as the Client.
+AddOpenTelemetry for Tracing and Metrics.

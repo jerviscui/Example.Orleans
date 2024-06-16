@@ -14,14 +14,13 @@ COPY ./Grains/Grains.csproj /src/Grains/Grains.csproj
 COPY ./SiloHost2/SiloHost2.csproj /src/SiloHost2/SiloHost2.csproj
 COPY ./Grains/Grains.csproj /src/Grains/Grains.csproj
 COPY ./Interfaces/Interfaces.csproj /src/Interfaces/Interfaces.csproj
-COPY ./Client/Client.csproj /src/Client/Client.csproj
+COPY ./Api/Api.csproj /src/Api/Api.csproj
 RUN dotnet restore "/src/SiloHost/SiloHost.csproj"
 RUN dotnet restore "/src/SiloHost2/SiloHost2.csproj"
-RUN dotnet restore "/src/Client/Client.csproj"
+RUN dotnet restore "/src/Api/Api.csproj"
 
-COPY ./SiloHost2/src/* /src/SiloHost2/src/
-COPY ./Interfaces/src/* /src/Interfaces/src/
-COPY ./Interfaces/*.cs /src/Interfaces/
+COPY ./SiloHost2/ /src/SiloHost2/
+COPY ./Interfaces/ /src/Interfaces/
 RUN dotnet build "/src/SiloHost2/SiloHost2.csproj" -c Release
 
 FROM build AS publish
@@ -30,7 +29,6 @@ COPY ./ops/entrypoint.sh /app/publish/
 
 FROM base AS final
 COPY --from=publish /app/publish ./
-EXPOSE 3000
 EXPOSE 8080
 CMD ["dotnet", "SiloHost2.dll"]
 ENTRYPOINT ["./entrypoint.sh"]

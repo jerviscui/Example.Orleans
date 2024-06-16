@@ -64,7 +64,8 @@ internal static class Program
         var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
-        var clusterId = "dev";
+        var clusterId = "dev6";
+        var serviceId = "road6";
 
 #if DEBUG
         var domain = "localhost";
@@ -83,7 +84,7 @@ internal static class Program
                 _ = siloBuilder.Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = clusterId;
-                    options.ServiceId = "road4b";
+                    options.ServiceId = serviceId;
                 });
                 _ = siloBuilder.Configure<EndpointOptions>(endpointOptions =>
                 {
@@ -101,7 +102,7 @@ internal static class Program
                 {
                     _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                         .AddService(
-                            "road4b",
+                            serviceId,
                             serviceVersion: "1.0.0",
                             serviceInstanceId: instance,
                             serviceNamespace: clusterId));

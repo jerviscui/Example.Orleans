@@ -2,7 +2,6 @@ using Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MyNamespace;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using StackExchange.Redis;
@@ -41,7 +40,7 @@ await Host.CreateDefaultBuilder(args)
             }
             catch (TaskCanceledException)
             {
-                // cancellation ignored
+                return false;
             }
 
             return true;

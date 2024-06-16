@@ -1,6 +1,7 @@
 **
-!**/src
 !**/*.cs
 !**/*.csproj
+!**/appsettings.*
 !ops/
-!appsettings.*.json
+**/bin/**
+**/obj/**

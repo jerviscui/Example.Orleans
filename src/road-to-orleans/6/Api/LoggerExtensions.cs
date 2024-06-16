@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Logging;
-
-namespace Client;
+namespace Api;
 
 public static partial class LoggerExtensions
 {
@@ -9,6 +7,9 @@ public static partial class LoggerExtensions
 
     [LoggerMessage(EventId = 1000, Level = LogLevel.Error, Message = "Connection Retry.")]
     public static partial void ConnectionFailed(this ILogger logger);
+
+    [LoggerMessage(EventId = 1000, Level = LogLevel.Error, Message = "Run error.")]
+    public static partial void RunError(this ILogger logger);
 
     #endregion
 
