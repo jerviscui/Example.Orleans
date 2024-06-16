@@ -12,8 +12,8 @@ To run, use any of the methods listed below:
 
 To verify everything is working correctly:
 
-* Dashboard: http://localhost:8081
-* Dashboard if running with Docker http://localhost:3000 
+* Dashboard: <http://localhost:8081>
+* Dashboard if running with Docker <http://localhost:3000>
 
 Provided the ports are not changed.
 
