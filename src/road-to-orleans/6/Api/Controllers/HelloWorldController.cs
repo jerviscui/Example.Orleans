@@ -35,10 +35,12 @@ public class HelloWorldController : ControllerBase
         catch (OperationCanceledException ex)
         {
             _logger.LogError(ex, "SayHelloAsync Canceled: {Message}", ex.Message);
+            return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "SayHelloAsync error: {Message}", ex.Message);
+            return BadRequest(ex.Message);
         }
 
         return Ok($"Hello World! {key}");

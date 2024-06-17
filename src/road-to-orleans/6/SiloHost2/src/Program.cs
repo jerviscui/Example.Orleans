@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -107,7 +108,7 @@ internal static class Program
                 {
                     _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
                         .AddService(
-                            serviceId,
+                            "road62",
                             serviceVersion: "1.0.0",
                             serviceInstanceId: instance,
                             serviceNamespace: clusterId));
@@ -120,6 +121,28 @@ internal static class Program
                         exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
                         metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000; // default 60s
                         // metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
+                    });
+                })
+                .WithTracing(providerBuilder =>
+                {
+                    providerBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService(
+                            "road62",
+                            serviceVersion: "1.0.0",
+                            serviceInstanceId: instance,
+                            serviceNamespace: clusterId));
+
+                    providerBuilder.SetSampler(new AlwaysOnSampler());
+
+                    // orleans
+                    providerBuilder.AddSource("Microsoft.Orleans.Runtime");
+                    providerBuilder.AddSource("Microsoft.Orleans.Application");
+
+                    // grpc
+                    providerBuilder.AddOtlpExporter(options =>
+                    {
+                        options.Protocol = OtlpExportProtocol.Grpc;
+                        options.Endpoint = new Uri($"http://{domain}:4317");
                     });
                 }))
             .ConfigureLogging(logging => logging.AddConsole())
