@@ -51,6 +51,13 @@ internal static class Program
         throw new NotImplementedException();
     }
 
+    public static bool IsDevelopment()
+    {
+        return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals(
+            Environments.Development,
+            StringComparison.OrdinalIgnoreCase) ?? false;
+    }
+
     public static async Task Main()
     {
         var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
@@ -68,13 +75,14 @@ internal static class Program
         var clusterId = "dev6";
         var serviceId = "road6";
 
-#if DEBUG
-        var domain = "localhost";
-        var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=7,allowAdmin=true");
-#else
         var domain = "host.docker.internal";
         var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=6,allowAdmin=true");
-#endif
+
+        if (IsDevelopment())
+        {
+            domain = "localhost";
+            redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=7,allowAdmin=true");
+        }
 
         var host = new HostBuilder()
             .UseOrleans(siloBuilder =>
@@ -97,6 +105,8 @@ internal static class Program
                 });
 
                 _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
+
+                siloBuilder.AddActivityPropagation();
             })
             .ConfigureServices(services => services.AddOpenTelemetry()
                 .WithMetrics(builder =>

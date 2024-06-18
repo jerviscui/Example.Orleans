@@ -192,7 +192,7 @@ csharp_prefer_simple_using_statement = true
 csharp_style_namespace_declarations = file_scoped
 csharp_style_prefer_method_group_conversion = true
 csharp_style_prefer_primary_constructors = true
-csharp_style_prefer_top_level_statements = true
+csharp_style_prefer_top_level_statements = false
 
 # 表达式级首选项
 csharp_prefer_simple_default_expression = true
@@ -773,7 +773,7 @@ dotnet_diagnostic.S1172.severity = none
 dotnet_diagnostic.S125.severity = none
 
 # S1481: Unused local variables should be removed
-# dotnet_diagnostic.S1481.severity = none
+dotnet_diagnostic.S1481.severity = none
 
 # S1854: Unused assignments should be removed
 dotnet_diagnostic.S1854.severity = none
