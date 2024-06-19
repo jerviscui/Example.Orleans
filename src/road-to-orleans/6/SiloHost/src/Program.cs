@@ -133,8 +133,8 @@ internal static class Program
                     _ = providerBuilder.SetSampler(new AlwaysOnSampler());
 
                     // orleans
-                    _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime");
-                    _ = providerBuilder.AddSource("Microsoft.Orleans.Application");
+                    _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime")
+                        .AddSource("Microsoft.Orleans.Application");
 
                     // grpc
                     _ = providerBuilder.AddOtlpExporter(options =>

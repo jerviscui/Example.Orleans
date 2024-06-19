@@ -108,13 +108,14 @@ internal class Program
             .WithMetrics((builder) =>
             {
                 _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                    .AddService(
-                        "road6api",
-                        serviceVersion: "1.0.0",
-                        serviceInstanceId: instance,
-                        serviceNamespace: clusterId));
+                    .AddService("road6api", clusterId, "1.0.0", serviceInstanceId: instance));
 
-                _ = builder.AddMeter("Microsoft.Orleans");
+                _ = builder.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddRuntimeInstrumentation()
+                    .AddProcessInstrumentation();
+
+                // _ = builder.SetExemplarFilter(ExemplarFilterType.TraceBased);
 
                 _ = builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
                 {
@@ -133,8 +134,7 @@ internal class Program
 
                 _ = providerBuilder.AddAspNetCoreInstrumentation();
                 // orleans
-                _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime");
-                _ = providerBuilder.AddSource("Microsoft.Orleans.Application");
+                _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime").AddSource("Microsoft.Orleans.Application");
 
                 // grpc
                 _ = providerBuilder.AddOtlpExporter(options =>
