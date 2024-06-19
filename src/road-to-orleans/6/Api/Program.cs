@@ -47,6 +47,9 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
+        _ = ThreadPool.SetMinThreads(100, 100);
+        _ = ThreadPool.SetMaxThreads(200, 200);
+
         var builder = WebApplication.CreateBuilder(args);
 
         _ = builder.Services.AddControllers();
@@ -124,11 +127,7 @@ internal class Program
             .WithTracing(providerBuilder =>
             {
                 _ = providerBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                    .AddService(
-                        "road6api",
-                        serviceVersion: "1.0.0",
-                        serviceInstanceId: instance,
-                        serviceNamespace: clusterId));
+                    .AddService("road6api", clusterId, "1.0.0", serviceInstanceId: instance));
 
                 _ = providerBuilder.SetSampler(new AlwaysOnSampler());
 

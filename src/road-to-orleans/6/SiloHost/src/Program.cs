@@ -59,6 +59,9 @@ internal static class Program
 
     public static async Task Main()
     {
+        _ = ThreadPool.SetMinThreads(100, 100);
+        _ = ThreadPool.SetMaxThreads(200, 200);
+
         var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
         var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
