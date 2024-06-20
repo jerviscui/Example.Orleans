@@ -105,11 +105,10 @@ internal class Program
 
         _ = builder.Services
             .AddOpenTelemetry()
+            .ConfigureResource((builder) =>
+                builder.AddService("road6api", clusterId, "1.0.0", serviceInstanceId: instance))
             .WithMetrics((builder) =>
             {
-                _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                    .AddService("road6api", clusterId, "1.0.0", serviceInstanceId: instance));
-
                 _ = builder.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddRuntimeInstrumentation()
@@ -127,9 +126,6 @@ internal class Program
             })
             .WithTracing(providerBuilder =>
             {
-                _ = providerBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                    .AddService("road6api", clusterId, "1.0.0", serviceInstanceId: instance));
-
                 _ = providerBuilder.SetSampler(new AlwaysOnSampler());
 
                 _ = providerBuilder.AddAspNetCoreInstrumentation();

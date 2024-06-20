@@ -15,7 +15,7 @@ public class InterGrain : Grain, IInterGrain
     {
         try
         {
-            await Task.Delay(500, token.GetCancellationToken());
+            await Task.Delay(10, token.GetCancellationToken());
         }
         catch (TaskCanceledException ex)
         {
