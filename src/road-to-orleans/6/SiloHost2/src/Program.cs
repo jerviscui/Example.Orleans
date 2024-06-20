@@ -114,12 +114,12 @@ internal static class Program
                 _ = siloBuilder.AddActivityPropagation();
             })
 
-            .ConfigureServices(services => services.AddOpenTelemetry()
+            .ConfigureServices(services =>
+                services.AddOpenTelemetry()
+                .ConfigureResource((builder) =>
+                    builder.AddService("road62", clusterId, "1.0.0", serviceInstanceId: instance))
                 .WithMetrics(builder =>
                 {
-                    _ = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                        .AddService("road62", clusterId, "1.0.0", serviceInstanceId: instance));
-
                     _ = builder.AddMeter("Microsoft.Orleans");
 
                     _ = builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
@@ -132,9 +132,6 @@ internal static class Program
                 })
                 .WithTracing(providerBuilder =>
                 {
-                    _ = providerBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                        .AddService("road62", clusterId, "1.0.0", serviceInstanceId: instance));
-
                     _ = providerBuilder.SetSampler(new AlwaysOnSampler());
 
                     // orleans
