@@ -1,16 +1,17 @@
 using Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class HelloWorldController : ControllerBase
+public class OneKeyController : ControllerBase
 {
     private readonly IClusterClient _clusterClient;
-    private readonly ILogger<HelloWorldController> _logger;
+    private readonly ILogger<OneKeyController> _logger;
 
-    public HelloWorldController(ILogger<HelloWorldController> logger, IClusterClient clusterClient)
+    public OneKeyController(ILogger<OneKeyController> logger, IClusterClient clusterClient)
     {
         _logger = logger;
         _clusterClient = clusterClient;
@@ -18,11 +19,17 @@ public class HelloWorldController : ControllerBase
 
     #region Methods
 
-    [HttpGet(Name = "Say")]
-    public async Task<IActionResult> SayAsync(CancellationToken cancellationToken = default)
+    [HttpGet("Say")]
+    public Task<IActionResult> Say2Async([Required][Range(1, int.MaxValue)] int key,
+        CancellationToken cancellationToken = default)
     {
-        var key = Random.Shared.Next();
+        return SayAsync(key, cancellationToken);
+    }
 
+    [HttpGet("Say/{key}")]
+    public async Task<IActionResult> SayAsync([Required][Range(1, int.MaxValue)] int key,
+        CancellationToken cancellationToken = default)
+    {
         try
         {
             using var gcts = new GrainCancellationTokenSource();
