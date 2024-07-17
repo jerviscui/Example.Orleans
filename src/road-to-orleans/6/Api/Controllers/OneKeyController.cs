@@ -41,12 +41,14 @@ public class OneKeyController : ControllerBase
         }
         catch (OperationCanceledException ex)
         {
-            _logger.LogError(ex, "SayHelloAsync Canceled: {Message}", ex.Message);
+            _logger.GrainCanceled(ex.Message);
+
             return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "SayHelloAsync error: {Message}", ex.Message);
+            _logger.GrainError(ex.Message);
+
             return BadRequest(ex.Message);
         }
 
