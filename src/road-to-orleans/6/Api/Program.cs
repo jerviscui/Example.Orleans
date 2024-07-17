@@ -56,6 +56,8 @@ internal class Program
         _ = builder.Services.AddEndpointsApiExplorer();
         _ = builder.Services.AddSwaggerGen();
 
+        _ = builder.Logging.AddJsonConsole();
+
         var domain = "host.docker.internal";
         var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=6,allowAdmin=true");
         if (IsDevelopment())
