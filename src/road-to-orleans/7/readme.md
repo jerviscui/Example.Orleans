@@ -2,5 +2,9 @@
 
 This example builds on top of solution 4b.
 
-Use the Web Api as the Client.
-AddOpenTelemetry for Tracing and Metrics.
+1. Call Serialization
+2. Storage Serialization
+3. Persistence
+4. MessagePack
+5. Transaction
+6. Distributed Transaction
