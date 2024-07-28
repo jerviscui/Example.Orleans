@@ -66,7 +66,7 @@ internal class Program
             redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=7,allowAdmin=true");
         }
 
-        var factory = LoggerFactory.Create(builder => builder.AddConsole());
+        using var factory = LoggerFactory.Create(builder => builder.AddJsonConsole());
         var logger = factory.CreateLogger<Program>();
 
         var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
@@ -164,9 +164,9 @@ internal class Program
         {
             await app.RunAsync();
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            logger.RunError();
+            logger.RunError(e.Message);
         }
     }
 

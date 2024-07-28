@@ -1,4 +1,3 @@
-using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -113,7 +112,8 @@ internal static class Program
                 _ = siloBuilder.AddAdoNetGrainStorageAsDefault((storageOptions) =>
                 {
                     storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
-                    storageOptions.ConnectionString = string.Empty;
+                    storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
+                    // storageOptions.GrainStorageSerializer
                 });
             })
             .ConfigureServices(services =>
@@ -154,24 +154,6 @@ internal static class Program
         await host.StartAsync(CancellationToken.None);
 
         var serializer = host.Services.GetRequiredService<IGrainStorageSerializer>();
-
-        var factory = host.Services.GetRequiredService<IGrainFactory>();
-        var grain = factory.GetGrain<IHelloWorld>(0);
-
-        await grain.SayHelloAsync("Server")
-            .ContinueWith((t) =>
-            {
-                Console.WriteLine("SiloHost start run:");
-
-                if (t.IsCompletedSuccessfully)
-                {
-                    Console.WriteLine(t.Result);
-                }
-                else
-                {
-                    Console.WriteLine(t.Exception?.Message);
-                }
-            });
 
         await host.WaitForShutdownAsync(CancellationToken.None);
     }
