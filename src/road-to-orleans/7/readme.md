@@ -8,3 +8,4 @@ This example builds on top of solution 4b.
 4. MessagePack
 5. Transaction
 6. Distributed Transaction
+7. 重分区（activation repartitioning）

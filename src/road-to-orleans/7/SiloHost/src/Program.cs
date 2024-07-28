@@ -9,6 +9,7 @@ using OpenTelemetry.Trace;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Storage;
 using StackExchange.Redis;
 using System;
 using System.Globalization;
@@ -108,6 +109,12 @@ internal static class Program
                 _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
 
                 _ = siloBuilder.AddActivityPropagation();
+
+                _ = siloBuilder.AddAdoNetGrainStorageAsDefault((storageOptions) =>
+                {
+                    storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
+                    storageOptions.ConnectionString = string.Empty;
+                });
             })
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()
@@ -145,6 +152,8 @@ internal static class Program
             .Build();
 
         await host.StartAsync(CancellationToken.None);
+
+        var serializer = host.Services.GetRequiredService<IGrainStorageSerializer>();
 
         var factory = host.Services.GetRequiredService<IGrainFactory>();
         var grain = factory.GetGrain<IHelloWorld>(0);
