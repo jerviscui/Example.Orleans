@@ -4,6 +4,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Orleans.Configuration;
+using Orleans.Serialization;
 using StackExchange.Redis;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -104,11 +105,11 @@ internal sealed class Program
 
             _ = clientBuilder.AddActivityPropagation();
 
-            // _ = clientBuilder.Services
-            // .AddSerializer((serializerBuilder) =>
-            // {
-            // _ = serializerBuilder.AddJsonSerializer((type) => true);
-            // });
+            _ = clientBuilder.Services
+                .AddSerializer((serializerBuilder) =>
+                {
+                    _ = serializerBuilder.AddJsonSerializer((type) => true);
+                });
         });
 
         _ = builder.Services
