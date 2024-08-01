@@ -18,11 +18,11 @@ public class OrderController : ControllerBase
 
     #region Methods
 
-    [HttpPost("Create")]
-    public async Task<IActionResult> CreateAsync(OrderInput order, CancellationToken cancellationToken = default)
+    [HttpPost("Create/{id}")]
+    public async Task<IActionResult> CreateAsync(long id, OrderInput order,
+        CancellationToken cancellationToken = default)
     {
-        // var key = Random.Shared.Next(1, int.MaxValue);
-        var key = 1L;
+        var key = id;
 
         try
         {

@@ -103,6 +103,12 @@ internal sealed class Program
             });
 
             _ = clientBuilder.AddActivityPropagation();
+
+            // _ = clientBuilder.Services
+            // .AddSerializer((serializerBuilder) =>
+            // {
+            // _ = serializerBuilder.AddJsonSerializer((type) => true);
+            // });
         });
 
         _ = builder.Services

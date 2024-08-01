@@ -398,4 +398,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-**/Generated/**/*.g.cs
+**/_Generated/**/*.g.cs

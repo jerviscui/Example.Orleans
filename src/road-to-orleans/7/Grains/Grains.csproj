@@ -4,12 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+    <CompilerGeneratedFilesOutputPath>_Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Generated\**\*.g.cs" />
-    <None Include="Generated\**\*.g.cs" />
+    <Compile Remove="_Generated\**\*.g.cs" />
+    <None Include="_Generated\**\*.g.cs" />
   </ItemGroup>
 
   <ItemGroup>
