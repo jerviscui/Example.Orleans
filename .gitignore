@@ -397,3 +397,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+**/Generated/**/*.g.cs

@@ -1,16 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="Microsoft.Orleans.Runtime" Version="8.2.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Generated\**\*.g.cs" />
+    <None Include="Generated\**\*.g.cs" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Interfaces\Interfaces.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Runtime" Version="8.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
+  </ItemGroup>
 
 </Project>

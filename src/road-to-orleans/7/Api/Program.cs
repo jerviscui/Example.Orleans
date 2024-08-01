@@ -9,7 +9,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-internal class Program
+internal sealed class Program
 {
 
     #region Constants & Statics
@@ -172,7 +172,7 @@ internal class Program
 
     #endregion
 
-    protected Program()
+    private Program()
     {
     }
 }
