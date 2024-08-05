@@ -3,12 +3,12 @@ using System;
 
 namespace Interfaces;
 
+[Immutable]
 [GenerateSerializer]
-// [Immutable]
 [Alias("Interfaces.OrderInput")]
-public class OrderInput
+public class OrderCreateInput
 {
-    public OrderInput(string number, DateTime creationTime)
+    public OrderCreateInput(string number, DateTime creationTime)
     {
         Number = number;
         CreationTime = creationTime;
@@ -20,7 +20,7 @@ public class OrderInput
     public DateTime CreationTime { get; set; }
 
     [Id(1)]
-    public required string Number { get; set; }
+    public string Number { get; set; }
 
     #endregion
 

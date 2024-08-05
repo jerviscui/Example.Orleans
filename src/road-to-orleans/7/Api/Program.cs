@@ -1,4 +1,5 @@
 using Api;
+using Interfaces;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -108,7 +109,11 @@ internal sealed class Program
             _ = clientBuilder.Services
                 .AddSerializer((serializerBuilder) =>
                 {
-                    _ = serializerBuilder.AddJsonSerializer((type) => true);
+                    _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
+                })
+                .AddSerializer((serializerBuilder) =>
+                {
+                    _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
                 });
         });
 

@@ -1,3 +1,4 @@
+using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using OpenTelemetry.Trace;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Serialization;
 using Orleans.Storage;
 using StackExchange.Redis;
 using System;
@@ -115,6 +117,16 @@ internal static class Program
                     storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
                     // storageOptions.GrainStorageSerializer
                 });
+
+                _ = siloBuilder.Services
+                    .AddSerializer((serializerBuilder) =>
+                    {
+                        _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
+                    })
+                    .AddSerializer((serializerBuilder) =>
+                    {
+                        _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
+                    });
             })
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()

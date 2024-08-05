@@ -19,7 +19,7 @@ public class OrderController : ControllerBase
     #region Methods
 
     [HttpPost("Create/{id}")]
-    public async Task<IActionResult> CreateAsync(long id, OrderInput order,
+    public async Task<IActionResult> CreateAsync(long id, OrderCreateInput order,
         CancellationToken cancellationToken = default)
     {
         var key = id;
@@ -47,6 +47,66 @@ public class OrderController : ControllerBase
         }
 
         return Ok($"Order created: {key}");
+    }
+
+    [HttpDelete("Delete")]
+    public async Task<IActionResult> DeleteAsync(OrderDeleteInput order, CancellationToken cancellationToken = default)
+    {
+        var key = order.Id;
+
+        try
+        {
+            using var gcts = new GrainCancellationTokenSource();
+            using var registration = gcts.RegisterTo(cancellationToken);
+
+            var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
+
+            await orderGrain.DeleteAsync(order, gcts.Token);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.GrainCanceled(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.GrainError(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+
+        return Ok($"Order deleted: {key}");
+    }
+
+    [HttpPut("Update")]
+    public async Task<IActionResult> UpdateAsync(OrderUpdateInput order, CancellationToken cancellationToken = default)
+    {
+        var key = order.Id;
+
+        try
+        {
+            using var gcts = new GrainCancellationTokenSource();
+            using var registration = gcts.RegisterTo(cancellationToken);
+
+            var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
+
+            await orderGrain.UpdateAsync(order, gcts.Token);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.GrainCanceled(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.GrainError(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+
+        return Ok($"Order updated: {key}");
     }
 
     #endregion
