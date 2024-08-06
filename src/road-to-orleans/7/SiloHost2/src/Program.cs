@@ -1,4 +1,3 @@
-using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -112,6 +111,12 @@ internal static class Program
                 _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
 
                 _ = siloBuilder.AddActivityPropagation();
+
+                _ = siloBuilder.AddAdoNetGrainStorageAsDefault((storageOptions) =>
+                {
+                    storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
+                    storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
+                });
             })
 
             .ConfigureServices(services =>
@@ -150,24 +155,6 @@ internal static class Program
             .Build();
 
         await host.StartAsync(CancellationToken.None);
-
-        var factory = host.Services.GetRequiredService<IGrainFactory>();
-        var grain = factory.GetGrain<IInterGrain>(0);
-
-        await grain.SayInternalAsync("Server2")
-            .ContinueWith((t) =>
-            {
-                Console.WriteLine("SiloHost2 start run:");
-
-                if (t.IsCompletedSuccessfully)
-                {
-                    Console.WriteLine(t.Result);
-                }
-                else
-                {
-                    Console.WriteLine(t.Exception?.Message);
-                }
-            });
 
         await host.WaitForShutdownAsync(CancellationToken.None);
     }

@@ -10,7 +10,6 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Serialization;
-using Orleans.Storage;
 using StackExchange.Redis;
 using System;
 using System.Globalization;
@@ -115,7 +114,6 @@ internal static class Program
                 {
                     storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
                     storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
-                    // storageOptions.GrainStorageSerializer
                 });
 
                 _ = siloBuilder.Services
@@ -164,8 +162,6 @@ internal static class Program
             .Build();
 
         await host.StartAsync(CancellationToken.None);
-
-        var serializer = host.Services.GetRequiredService<IGrainStorageSerializer>();
 
         await host.WaitForShutdownAsync(CancellationToken.None);
     }

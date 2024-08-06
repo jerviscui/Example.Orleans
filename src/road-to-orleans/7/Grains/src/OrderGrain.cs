@@ -8,11 +8,13 @@ namespace Grains;
 
 public class OrderGrain : Grain, IOrderGrain
 {
+    private readonly IGrainFactory _factory;
     private readonly IPersistentState<Order> _orders;
 
-    public OrderGrain([PersistentState("Order")] IPersistentState<Order> persistentState)
+    public OrderGrain([PersistentState("Order")] IPersistentState<Order> persistentState, IGrainFactory factory)
     {
         _orders = persistentState;
+        _factory = factory;
     }
 
     #region IOrderGrain implementations
@@ -23,6 +25,22 @@ public class OrderGrain : Grain, IOrderGrain
         {
             return;
         }
+
+        _orders.State = new Order(order.CreationTime, this.GetPrimaryKeyLong(), order.Number);
+
+        await _orders.WriteStateAsync();
+    }
+
+    public async Task CreateWithStockAsync(OrderCreateInput order, StockCreateInput stock,
+        GrainCancellationToken? token = null)
+    {
+        if (_orders.RecordExists)
+        {
+            return;
+        }
+
+        var stockGrain = _factory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
+        await stockGrain.CreateAsync(stock, token);
 
         _orders.State = new Order(order.CreationTime, this.GetPrimaryKeyLong(), order.Number);
 
