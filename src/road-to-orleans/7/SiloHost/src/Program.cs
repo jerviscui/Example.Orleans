@@ -125,6 +125,8 @@ internal static class Program
                     {
                         _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
                     });
+
+                _ = siloBuilder.UseTransactions();
             })
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()

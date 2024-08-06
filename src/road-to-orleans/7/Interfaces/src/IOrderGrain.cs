@@ -26,6 +26,7 @@ public interface IOrderGrain : IGrainWithIntegerKey
     /// <param name="token">The token.</param>
     /// <returns></returns>
     [Alias("CreateWithStockAsync")]
+    [Transaction(TransactionOption.Create)]
     Task CreateWithStockAsync(OrderCreateInput order, StockCreateInput stock, GrainCancellationToken? token = null);
 
     /// <summary>
