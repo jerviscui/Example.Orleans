@@ -1,5 +1,10 @@
+using Orleans;
+
 namespace SiloHost2;
 
+[Immutable]
+[GenerateSerializer]
+[Alias("SiloHost2.Stock")]
 public class Stock
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -17,10 +22,13 @@ public class Stock
 
     #region Properties
 
+    [Id(0)]
     public int Count { get; set; }
 
+    [Id(1)]
     public string Goods { get; set; }
 
+    [Id(2)]
     public long Id { get; set; }
 
     #endregion

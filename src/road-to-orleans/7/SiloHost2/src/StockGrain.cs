@@ -1,6 +1,7 @@
 using Interfaces;
 using Orleans;
 using Orleans.Transactions.Abstractions;
+using System;
 using System.Threading.Tasks;
 
 namespace SiloHost2;
@@ -18,10 +19,18 @@ public class StockGrain : Grain, IStockGrain
 
     public async Task CreateAsync(StockCreateInput stock, GrainCancellationToken? token = null)
     {
-        await _stockState.PerformUpdate(o =>
+        try
         {
-            o = new Stock(this.GetPrimaryKeyLong(), stock.Goods, stock.Count);
-        });
+            await _stockState.PerformUpdate(o =>
+            {
+                o = new Stock(this.GetPrimaryKeyLong(), stock.Goods, stock.Count);
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
     }
 
     #endregion

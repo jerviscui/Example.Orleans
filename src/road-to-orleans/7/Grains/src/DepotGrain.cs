@@ -1,6 +1,7 @@
 using Interfaces;
 using Orleans;
 using Orleans.Transactions.Abstractions;
+using System;
 using System.Threading.Tasks;
 
 namespace Grains;
@@ -21,20 +22,28 @@ public class DepotGrain : Grain, IDepotGrain
 
     public async Task CreateWithStockAsync(DepotCreateInput depot, GrainCancellationToken? token = null)
     {
-        var data = await _depotState.PerformRead((o) => o);
-
-        if (data is null)
+        try
         {
-            return;
+            var data = await _depotState.PerformRead((o) => o);
+
+            if (data is null)
+            {
+                return;
+            }
+
+            var stockGrain = _factory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
+            await stockGrain.CreateAsync(depot.StockCreateInput, token);
+
+            // await _depotState.PerformUpdate((o) =>
+            // {
+            // o = new Depot(depot.CreationTime, this.GetPrimaryKeyLong(), depot.Name);
+            // });
         }
-
-        var stockGrain = _factory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
-        await stockGrain.CreateAsync(depot.StockCreateInput, token);
-
-        await _depotState.PerformUpdate((o) =>
+        catch (Exception ex)
         {
-            o = new Depot(depot.CreationTime, this.GetPrimaryKeyLong(), depot.Name);
-        });
+            Console.WriteLine(ex.Message);
+            throw;
+        }
     }
 
     #endregion
