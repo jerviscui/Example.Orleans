@@ -1,3 +1,4 @@
+using Azure.Data.Tables;
 using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -127,6 +128,12 @@ internal static class Program
                     });
 
                 _ = siloBuilder.UseTransactions();
+                _ = siloBuilder.AddAzureTableTransactionalStateStorage(
+                    "AzureTable",
+                    (options) =>
+                    {
+                        options.TableServiceClient = new TableServiceClient(string.Empty);
+                    });
             })
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()

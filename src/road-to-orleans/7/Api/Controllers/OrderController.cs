@@ -49,37 +49,6 @@ public class OrderController : ControllerBase
         return Ok($"Order created: {key}");
     }
 
-    [HttpPost("CreateWithStock/{id}")]
-    public async Task<IActionResult> CreateWithStockAsync(long id, OrderCreateInput order, StockCreateInput stock,
-        CancellationToken cancellationToken = default)
-    {
-        var key = id;
-
-        try
-        {
-            using var gcts = new GrainCancellationTokenSource();
-            using var registration = gcts.RegisterTo(cancellationToken);
-
-            var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
-
-            await orderGrain.CreateWithStockAsync(order, stock, gcts.Token);
-        }
-        catch (OperationCanceledException ex)
-        {
-            _logger.GrainCanceled(ex.Message);
-
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.GrainError(ex.Message);
-
-            return BadRequest(ex.Message);
-        }
-
-        return Ok($"Order created: {key}");
-    }
-
     [HttpDelete("Delete")]
     public async Task<IActionResult> DeleteAsync(OrderDeleteInput order, CancellationToken cancellationToken = default)
     {

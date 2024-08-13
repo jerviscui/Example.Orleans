@@ -8,70 +8,52 @@ namespace Grains;
 
 public class OrderGrain : Grain, IOrderGrain
 {
-    private readonly IGrainFactory _factory;
-    private readonly IPersistentState<Order> _orders;
+    private readonly IPersistentState<Order> _orderState;
 
-    public OrderGrain([PersistentState("Order")] IPersistentState<Order> persistentState, IGrainFactory factory)
+    public OrderGrain([PersistentState("Order")] IPersistentState<Order> persistentState)
     {
-        _orders = persistentState;
-        _factory = factory;
+        _orderState = persistentState;
     }
 
     #region IOrderGrain implementations
 
     public async Task CreateAsync(OrderCreateInput order, GrainCancellationToken? token = null)
     {
-        if (_orders.RecordExists)
+        if (_orderState.RecordExists)
         {
             return;
         }
 
-        _orders.State = new Order(order.CreationTime, this.GetPrimaryKeyLong(), order.Number);
+        _orderState.State = new Order(order.CreationTime, this.GetPrimaryKeyLong(), order.Number);
 
-        await _orders.WriteStateAsync();
-    }
-
-    public async Task CreateWithStockAsync(OrderCreateInput order, StockCreateInput stock,
-        GrainCancellationToken? token = null)
-    {
-        if (_orders.RecordExists)
-        {
-            return;
-        }
-
-        var stockGrain = _factory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
-        await stockGrain.CreateAsync(stock, token);
-
-        _orders.State = new Order(order.CreationTime, this.GetPrimaryKeyLong(), order.Number);
-
-        await _orders.WriteStateAsync();
+        await _orderState.WriteStateAsync();
     }
 
     public async Task DeleteAsync(OrderDeleteInput order, GrainCancellationToken? token = null)
     {
-        if (_orders.RecordExists)
+        if (_orderState.RecordExists)
         {
-            await _orders.ClearStateAsync();
+            await _orderState.ClearStateAsync();
         }
     }
 
     public async Task UpdateAsync(OrderUpdateInput order, GrainCancellationToken? token = null)
     {
-        if (_orders.RecordExists is false)
+        if (_orderState.RecordExists is false)
         {
             return;
         }
 
         if (order.Number is not null)
         {
-            _orders.State.Number = order.Number;
+            _orderState.State.Number = order.Number;
         }
         if (order.CreationTime is not null)
         {
-            _orders.State.CreationTime = (DateTime)order.CreationTime;
+            _orderState.State.CreationTime = (DateTime)order.CreationTime;
         }
 
-        await _orders.WriteStateAsync();
+        await _orderState.WriteStateAsync();
     }
 
     #endregion

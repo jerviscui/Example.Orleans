@@ -1,3 +1,4 @@
+using Azure.Data.Tables;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -117,6 +118,14 @@ internal static class Program
                     storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
                     storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
                 });
+
+                _ = siloBuilder.UseTransactions();
+                _ = siloBuilder.AddAzureTableTransactionalStateStorage(
+                    "AzureTable",
+                    (options) =>
+                    {
+                        options.TableServiceClient = new TableServiceClient(string.Empty);
+                    });
             })
 
             .ConfigureServices(services =>
