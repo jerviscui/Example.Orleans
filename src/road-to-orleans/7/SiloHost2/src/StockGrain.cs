@@ -23,7 +23,9 @@ public class StockGrain : Grain, IStockGrain
         {
             await _stockState.PerformUpdate(o =>
             {
-                o = new Stock(this.GetPrimaryKeyLong(), stock.Goods, stock.Count);
+                o.Id = this.GetPrimaryKeyLong();
+                o.Goods = stock.Goods;
+                o.Count = stock.Count;
             });
         }
         catch (Exception ex)

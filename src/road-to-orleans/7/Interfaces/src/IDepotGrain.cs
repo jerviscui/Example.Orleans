@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Interfaces;
 
-[Alias("Interfaces.IDepot")]
+[Alias("Interfaces.IDepotGrain")]
 public interface IDepotGrain : IGrainWithIntegerKey
 {
 

@@ -23,7 +23,7 @@ public class DepotGrain : Grain, IDepotGrain
         {
             var data = await _depotState.PerformRead((o) => o);
 
-            if (data is null)
+            if (data.Id != 0)
             {
                 return;
             }
@@ -31,10 +31,12 @@ public class DepotGrain : Grain, IDepotGrain
             var stockGrain = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
             await stockGrain.CreateAsync(depot.StockCreateInput, token);
 
-            // await _depotState.PerformUpdate((o) =>
-            // {
-            // o = new Depot(depot.CreationTime, this.GetPrimaryKeyLong(), depot.Name);
-            // });
+            await _depotState.PerformUpdate((o) =>
+            {
+                o.Id = this.GetPrimaryKeyLong();
+                o.Name = depot.Name;
+                o.CreationTime = depot.CreationTime;
+            });
         }
         catch (Exception ex)
         {
