@@ -10,11 +10,9 @@ public class HelloWorld : Grain, IHelloWorld
 #pragma warning disable IDE0052 // Remove unread private members
     private readonly IClusterClient _client;
 #pragma warning restore IDE0052 // Remove unread private members
-    private readonly IGrainFactory _grainFactory;
 
-    public HelloWorld(IGrainFactory grainFactory, IClusterClient client)
+    public HelloWorld(IClusterClient client)
     {
-        _grainFactory = grainFactory;
         _client = client;
     }
 
@@ -25,7 +23,7 @@ public class HelloWorld : Grain, IHelloWorld
         Console.WriteLine($"2: {DateTime.Now:HH:mm:ss.fff}");
 
         token?.CancellationToken.ThrowIfCancellationRequested();
-        var interGrain = _grainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong());
+        var interGrain = GrainFactory.GetGrain<IInterGrain>(this.GetPrimaryKeyLong());
 
         string result;
         try

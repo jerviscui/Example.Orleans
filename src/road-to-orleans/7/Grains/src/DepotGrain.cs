@@ -8,13 +8,10 @@ namespace Grains;
 
 public class DepotGrain : Grain, IDepotGrain
 {
-    private readonly IGrainFactory _factory;
     private readonly ITransactionalState<Depot> _depotState;
 
-    public DepotGrain(IGrainFactory factory,
-        [TransactionalState("Depot", "AzureTable")] ITransactionalState<Depot> depots)
+    public DepotGrain([TransactionalState("Depot", "AzureTable")] ITransactionalState<Depot> depots)
     {
-        _factory = factory;
         _depotState = depots;
     }
 
@@ -31,7 +28,7 @@ public class DepotGrain : Grain, IDepotGrain
                 return;
             }
 
-            var stockGrain = _factory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
+            var stockGrain = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
             await stockGrain.CreateAsync(depot.StockCreateInput, token);
 
             // await _depotState.PerformUpdate((o) =>
