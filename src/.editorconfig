@@ -799,6 +799,9 @@ dotnet_diagnostic.S2971.severity = none
 # S3878: Arrays should not be created for params parameters
 dotnet_diagnostic.S3878.severity = suggestion
 
+# S3445: Exceptions should not be explicitly rethrown
+dotnet_diagnostic.S3445.severity = none
+
 # S4487: Unread "private" fields should be removed
 dotnet_diagnostic.S4487.severity = none
 

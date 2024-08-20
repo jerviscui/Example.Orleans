@@ -3,15 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>_Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="_Generated\**\*.g.cs" />
-    <None Include="_Generated\**\*.g.cs" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Orleans.Runtime" Version="8.2.0" />
   </ItemGroup>
