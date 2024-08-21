@@ -9,6 +9,10 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0.204 as build
 
 RUN dotnet nuget add source "https://nuget.cdn.azure.cn/v3/index.json" -n "azure.cn"
 
+COPY ./Directory.Build.props /src/Directory.Build.props
+COPY ./Directory.Build.targets /src/Directory.Build.targets
+COPY ./Directory.Packages.props /src/Directory.Packages.props
+COPY ./nuget.config /src/nuget.config
 COPY ./SiloHost/SiloHost.csproj /src/SiloHost/SiloHost.csproj
 COPY ./Grains/Grains.csproj /src/Grains/Grains.csproj
 COPY ./SiloHost2/SiloHost2.csproj /src/SiloHost2/SiloHost2.csproj

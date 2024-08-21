@@ -3,5 +3,9 @@
 !**/*.csproj
 !**/appsettings.*
 !ops/
+!Directory.Build.props
+!Directory.Build.targets
+!Directory.Packages.props
+!nuget.config
 **/bin/**
 **/obj/**
