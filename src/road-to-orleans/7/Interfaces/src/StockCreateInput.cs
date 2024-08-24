@@ -1,4 +1,5 @@
 using Orleans;
+using System.ComponentModel.DataAnnotations;
 
 namespace Interfaces;
 
@@ -16,10 +17,12 @@ public class StockCreateInput
     #region Properties
 
     [Id(1)]
+    [Required]
     public int Count { get; set; }
 
     [Id(0)]
-    public required string Goods { get; set; }
+    [Required]
+    public string Goods { get; set; }
 
     #endregion
 

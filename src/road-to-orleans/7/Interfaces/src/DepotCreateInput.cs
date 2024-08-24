@@ -1,5 +1,6 @@
 using Orleans;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Interfaces;
 
@@ -18,12 +19,15 @@ public class DepotCreateInput
     #region Properties
 
     [Id(0)]
+    [Required]
     public DateTime CreationTime { get; set; }
 
     [Id(1)]
+    [Required]
     public string Name { get; set; }
 
     [Id(2)]
+    [Required]
     public StockCreateInput StockCreateInput { get; set; }
 
     #endregion
