@@ -1,4 +1,3 @@
-using Azure.Data.Tables;
 using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -127,13 +126,9 @@ internal static class Program
                         _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
                     });
 
-                _ = siloBuilder.UseTransactions();
-                _ = siloBuilder.AddAzureTableTransactionalStateStorage(
-                    "AzureTable",
-                    (options) =>
-                    {
-                        options.TableServiceClient = new TableServiceClient(string.Empty);
-                    });
+#pragma warning disable ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                _ = siloBuilder.AddActivationRepartitioner();
+#pragma warning restore ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             })
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()

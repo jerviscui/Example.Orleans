@@ -1,4 +1,3 @@
-using Azure.Data.Tables;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -119,13 +118,9 @@ internal static class Program
                     storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
                 });
 
-                _ = siloBuilder.UseTransactions();
-                _ = siloBuilder.AddAzureTableTransactionalStateStorage(
-                    "AzureTable",
-                    (options) =>
-                    {
-                        options.TableServiceClient = new TableServiceClient(string.Empty);
-                    });
+#pragma warning disable ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                _ = siloBuilder.AddActivationRepartitioner();
+#pragma warning restore ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             })
 
             .ConfigureServices(services =>
