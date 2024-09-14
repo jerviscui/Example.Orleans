@@ -5,10 +5,10 @@ namespace Interfaces;
 
 [Immutable]
 [GenerateSerializer]
-[Alias("Interfaces.StockCreateInput")]
-public class StockCreateInput
+[Alias("Interfaces.OrderDetailInput")]
+public class OrderDetailInput
 {
-    public StockCreateInput(string goods, int count)
+    public OrderDetailInput(string goods, int count)
     {
         Count = count;
         Goods = goods;

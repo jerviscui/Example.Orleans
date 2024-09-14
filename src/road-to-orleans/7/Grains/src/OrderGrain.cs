@@ -29,6 +29,21 @@ public class OrderGrain : Grain, IOrderGrain
         await _orderState.WriteStateAsync();
     }
 
+    public Task CreateErrorWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CreateWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CreateWithDetailErrorAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task DeleteAsync(OrderDeleteInput order, GrainCancellationToken? token = null)
     {
         if (_orderState.RecordExists)
@@ -39,7 +54,7 @@ public class OrderGrain : Grain, IOrderGrain
 
     public async Task UpdateAsync(OrderUpdateInput order, GrainCancellationToken? token = null)
     {
-        if (_orderState.RecordExists is false)
+        if (!_orderState.RecordExists)
         {
             return;
         }

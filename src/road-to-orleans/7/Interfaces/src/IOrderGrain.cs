@@ -24,6 +24,33 @@ public interface IOrderGrain : IGrainWithIntegerKey
     /// <param name="order">The order.</param>
     /// <param name="token">The token.</param>
     /// <returns></returns>
+    [Alias("CreateErrorWithDetailAsync")]
+    Task CreateErrorWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null);
+
+    /// <summary>
+    /// Creates order.
+    /// </summary>
+    /// <param name="order">The order.</param>
+    /// <param name="token">The token.</param>
+    /// <returns></returns>
+    [Alias("CreateWithDetailAsync")]
+    Task CreateWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null);
+
+    /// <summary>
+    /// Creates order.
+    /// </summary>
+    /// <param name="order">The order.</param>
+    /// <param name="token">The token.</param>
+    /// <returns></returns>
+    [Alias("CreateWithDetailErrorAsync")]
+    Task CreateWithDetailErrorAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null);
+
+    /// <summary>
+    /// Creates order.
+    /// </summary>
+    /// <param name="order">The order.</param>
+    /// <param name="token">The token.</param>
+    /// <returns></returns>
     [Alias("DeleteAsync")]
     Task DeleteAsync(OrderDeleteInput order, GrainCancellationToken? token = null);
 
