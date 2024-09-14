@@ -1,0 +1,39 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.4-alpine3.19 as base
+WORKDIR /app
+# Creates a non-root user with an explicit UID and adds permission to access the /app folder
+# For more info, please refer to https://aka.ms/vscode-docker-dotnet-configure-containers
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0.204 as build
+
+RUN dotnet nuget add source "https://nuget.cdn.azure.cn/v3/index.json" -n "azure.cn"
+
+COPY ./Directory.Build.props /src/Directory.Build.props
+COPY ./Directory.Build.targets /src/Directory.Build.targets
+COPY ./Directory.Packages.props /src/Directory.Packages.props
+COPY ./nuget.config /src/nuget.config
+COPY ./SiloHost/SiloHost.csproj /src/SiloHost/SiloHost.csproj
+COPY ./Grains/Grains.csproj /src/Grains/Grains.csproj
+COPY ./SiloHost2/SiloHost2.csproj /src/SiloHost2/SiloHost2.csproj
+COPY ./Grains/Grains.csproj /src/Grains/Grains.csproj
+COPY ./Interfaces/Interfaces.csproj /src/Interfaces/Interfaces.csproj
+COPY ./Api/Api.csproj /src/Api/Api.csproj
+RUN dotnet restore "/src/SiloHost/SiloHost.csproj"
+RUN dotnet restore "/src/SiloHost2/SiloHost2.csproj"
+RUN dotnet restore "/src/Api/Api.csproj"
+
+COPY ./SiloHost/ /src/SiloHost/
+COPY ./Grains/ /src/Grains/
+COPY ./Interfaces/ /src/Interfaces/
+RUN dotnet build "/src/SiloHost/SiloHost.csproj" -c Release
+
+FROM build AS publish
+RUN dotnet publish --verbosity normal "/src/SiloHost/SiloHost.csproj" -c Release -o /app/publish
+COPY ./ops/entrypoint.sh /app/publish/
+
+FROM base AS final
+COPY --from=publish /app/publish ./
+EXPOSE 8080
+CMD ["dotnet", "SiloHost.dll"]
+ENTRYPOINT ["./entrypoint.sh"]

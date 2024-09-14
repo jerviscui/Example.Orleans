@@ -1,5 +1,4 @@
 using Azure.Data.Tables;
-using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,6 @@ using OpenTelemetry.Trace;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.Serialization;
 using StackExchange.Redis;
 using System;
 using System.Globalization;
@@ -21,7 +19,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SiloHost;
+namespace SiloHost2;
 
 internal static class Program
 {
@@ -67,13 +65,13 @@ internal static class Program
         var advertisedIp = Environment.GetEnvironmentVariable("ADVERTISEDIP");
         var advertisedIpAddress = advertisedIp == null ? GetLocalIpAddress() : IPAddress.Parse(advertisedIp);
 
-        var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "11111";
+        var extractedSiloPort = Environment.GetEnvironmentVariable("SILOPORT") ?? "21111";
         var siloPort = int.Parse(extractedSiloPort, CultureInfo.CurrentCulture);
 
-        var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "30000";
+        var extractedGatewayPort = Environment.GetEnvironmentVariable("GATEWAYPORT") ?? "40000";
         var gatewayPort = int.Parse(extractedGatewayPort, CultureInfo.CurrentCulture);
 
-        var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
+        var instance = Environment.GetEnvironmentVariable(variable: "HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
         var clusterId = "dev7";
@@ -90,7 +88,11 @@ internal static class Program
         var host = new HostBuilder()
             .UseOrleans(siloBuilder =>
             {
-                _ = siloBuilder.UseDashboard(dashboardOptions => dashboardOptions.CounterUpdateIntervalMs = 10_000);
+                _ = siloBuilder.UseDashboard(dashboardOptions =>
+                {
+                    dashboardOptions.CounterUpdateIntervalMs = 10_000;
+                    dashboardOptions.Port = 28080;
+                });
 
                 _ = siloBuilder.UseRedisClustering(options => options.ConfigurationOptions = redisConfig);
                 _ = siloBuilder.Configure<ClusterOptions>(options =>
@@ -117,16 +119,6 @@ internal static class Program
                     storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
                 });
 
-                _ = siloBuilder.Services
-                    .AddSerializer((serializerBuilder) =>
-                    {
-                        _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
-                    })
-                    .AddSerializer((serializerBuilder) =>
-                    {
-                        _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
-                    });
-
                 _ = siloBuilder.UseTransactions();
                 _ = siloBuilder.AddAzureTableTransactionalStateStorage(
                     "AzureTable",
@@ -135,10 +127,11 @@ internal static class Program
                         options.TableServiceClient = new TableServiceClient(string.Empty);
                     });
             })
+
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()
                 .ConfigureResource((builder) =>
-                    builder.AddService("road7", clusterId, "1.0.0", serviceInstanceId: instance))
+                    builder.AddService("road72", clusterId, "1.0.0", serviceInstanceId: instance))
                 .WithMetrics(builder =>
                 {
                     _ = builder.AddMeter("Microsoft.Orleans");

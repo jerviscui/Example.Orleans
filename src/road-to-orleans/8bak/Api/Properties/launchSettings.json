@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "helloworld?name=NotMyName",
+      "applicationUrl": "http://localhost:5432",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OrleansSettings__AwsRegion": "us-west-2",
+        "OrleansSettings__MembershipTable": "some-table-name"
+      }
+    }
+  }
+}
