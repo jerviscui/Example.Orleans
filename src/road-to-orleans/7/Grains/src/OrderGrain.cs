@@ -8,11 +8,13 @@ namespace Grains;
 
 public class OrderGrain : Grain, IOrderGrain
 {
+    private readonly IGrainFactory _grainFactory;
     private readonly IPersistentState<Order> _orderState;
 
-    public OrderGrain([PersistentState("Order")] IPersistentState<Order> persistentState)
+    public OrderGrain([PersistentState("Order")] IPersistentState<Order> persistentState, IGrainFactory grainFactory)
     {
         _orderState = persistentState;
+        _grainFactory = grainFactory;
     }
 
     #region IOrderGrain implementations
@@ -29,14 +31,33 @@ public class OrderGrain : Grain, IOrderGrain
         await _orderState.WriteStateAsync();
     }
 
-    public Task CreateErrorWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
+    public async Task CreateErrorWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
     {
-        throw new NotImplementedException();
+        if (_orderState.RecordExists)
+        {
+            return;
+        }
+
+        var detailGrain = _grainFactory.GetGrain<IOrderDetailGrain>(this.GetPrimaryKeyLong());
+        await detailGrain.CreateAsync(order.DetailInput, token);
+
+        throw new Exception(string.Empty);
+        // todo: doing
     }
 
-    public Task CreateWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
+    public async Task CreateWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
     {
-        throw new NotImplementedException();
+        if (_orderState.RecordExists)
+        {
+            return;
+        }
+
+        var detailGrain = _grainFactory.GetGrain<IOrderDetailGrain>(this.GetPrimaryKeyLong());
+        await detailGrain.CreateAsync(order.DetailInput, token);
+
+        _orderState.State = new Order(order.CreationTime, this.GetPrimaryKeyLong(), order.Number);
+
+        await _orderState.WriteStateAsync();
     }
 
     public Task CreateWithDetailErrorAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)

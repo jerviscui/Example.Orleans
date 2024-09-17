@@ -755,7 +755,7 @@ dotnet_diagnostic.S907.severity = suggestion
 dotnet_diagnostic.S1075.severity = suggestion
 
 # S112: General or reserved exceptions should never be thrown
-dotnet_diagnostic.S112.severity = suggestion
+dotnet_diagnostic.S112.severity = none
 
 # S1125: Boolean literals should not be redundant
 dotnet_diagnostic.S1125.severity = none
