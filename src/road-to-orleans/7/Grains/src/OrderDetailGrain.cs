@@ -28,6 +28,11 @@ public class OrderDetailGrain : Grain, IOrderDetailGrain
         await _orderDetail.WriteStateAsync();
     }
 
+    public Task CreateErrorAsync(OrderDetailInput detail, GrainCancellationToken? token = null)
+    {
+        throw new PersistenceException("OrderDetailGrain test");
+    }
+
     #endregion
 
 }

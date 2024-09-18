@@ -41,8 +41,7 @@ public class OrderGrain : Grain, IOrderGrain
         var detailGrain = _grainFactory.GetGrain<IOrderDetailGrain>(this.GetPrimaryKeyLong());
         await detailGrain.CreateAsync(order.DetailInput, token);
 
-        throw new Exception(string.Empty);
-        // todo: doing
+        throw new PersistenceException("OrderGrain test");
     }
 
     public async Task CreateWithDetailAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
