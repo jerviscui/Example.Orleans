@@ -3,7 +3,7 @@ using Orleans;
 using Orleans.Runtime;
 using System.Threading.Tasks;
 
-namespace Grains;
+namespace SiloHost2;
 
 public class OrderDetailGrain : Grain, IOrderDetailGrain
 {

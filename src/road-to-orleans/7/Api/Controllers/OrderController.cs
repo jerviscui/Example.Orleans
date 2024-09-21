@@ -49,6 +49,99 @@ public class OrderController : ControllerBase
         return Ok($"Order created: {key}");
     }
 
+    [HttpPost("CreateErrorWithDetail/{id}")]
+    public async Task<IActionResult> CreateErrorWithDetailAsync(long id, OrderCreateWithDetailInput order,
+        CancellationToken cancellationToken = default)
+    {
+        var key = id;
+
+        try
+        {
+            using var gcts = new GrainCancellationTokenSource();
+            using var registration = gcts.RegisterTo(cancellationToken);
+
+            var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
+
+            await orderGrain.CreateErrorWithDetailAsync(order, gcts.Token);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.GrainCanceled(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.GrainError(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+
+        return Ok($"Order created: {key}");
+    }
+
+    [HttpPost("CreateWithDetail/{id}")]
+    public async Task<IActionResult> CreateWithDetailAsync(long id, OrderCreateWithDetailInput order,
+        CancellationToken cancellationToken = default)
+    {
+        var key = id;
+
+        try
+        {
+            using var gcts = new GrainCancellationTokenSource();
+            using var registration = gcts.RegisterTo(cancellationToken);
+
+            var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
+
+            await orderGrain.CreateWithDetailAsync(order, gcts.Token);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.GrainCanceled(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.GrainError(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+
+        return Ok($"Order created: {key}");
+    }
+
+    [HttpPost("CreateWithDetailError/{id}")]
+    public async Task<IActionResult> CreateWithDetailErrorAsync(long id, OrderCreateWithDetailInput order,
+        CancellationToken cancellationToken = default)
+    {
+        var key = id;
+
+        try
+        {
+            using var gcts = new GrainCancellationTokenSource();
+            using var registration = gcts.RegisterTo(cancellationToken);
+
+            var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
+
+            await orderGrain.CreateWithDetailErrorAsync(order, gcts.Token);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.GrainCanceled(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.GrainError(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+
+        return Ok($"Order created: {key}");
+    }
+
     [HttpDelete("Delete")]
     public async Task<IActionResult> DeleteAsync(OrderDeleteInput order, CancellationToken cancellationToken = default)
     {

@@ -59,9 +59,26 @@ public class OrderGrain : Grain, IOrderGrain
         await _orderState.WriteStateAsync();
     }
 
-    public Task CreateWithDetailErrorAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
+    public async Task CreateWithDetailErrorAsync(OrderCreateWithDetailInput order, GrainCancellationToken? token = null)
     {
-        throw new NotImplementedException();
+        if (_orderState.RecordExists)
+        {
+            return;
+        }
+
+        var detailGrain = _grainFactory.GetGrain<IOrderDetailGrain>(this.GetPrimaryKeyLong());
+        try
+        {
+            await detailGrain.CreateErrorAsync(order.DetailInput, token);
+        }
+        catch (PersistenceException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        _orderState.State = new Order(order.CreationTime, this.GetPrimaryKeyLong(), order.Number);
+
+        await _orderState.WriteStateAsync();
     }
 
     public async Task DeleteAsync(OrderDeleteInput order, GrainCancellationToken? token = null)

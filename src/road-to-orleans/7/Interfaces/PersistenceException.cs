@@ -1,7 +1,7 @@
 using Orleans;
 using System;
 
-namespace Grains;
+namespace Interfaces;
 
 [GenerateSerializer]
 [Alias("Grains.PersistenceException")]
