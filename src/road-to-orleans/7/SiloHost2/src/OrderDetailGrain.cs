@@ -9,7 +9,7 @@ public class OrderDetailGrain : Grain, IOrderDetailGrain
 {
     private readonly IPersistentState<OrderDetail> _orderDetail;
 
-    public OrderDetailGrain([PersistentState("Order")] IPersistentState<OrderDetail> persistentState)
+    public OrderDetailGrain([PersistentState("OrderDetail")] IPersistentState<OrderDetail> persistentState)
     {
         _orderDetail = persistentState;
     }

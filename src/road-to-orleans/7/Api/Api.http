@@ -1,6 +1,0 @@
-@Api_HostAddress = https://localhost:7210
-
-GET {{Api_HostAddress}}/HelloWorld/
-Accept: application/json
-
-###
