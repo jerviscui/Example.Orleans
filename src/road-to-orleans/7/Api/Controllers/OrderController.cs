@@ -62,6 +62,7 @@ public class OrderController : ControllerBase
 
             var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
 
+            // OrderDetail created, but Order not created
             await orderGrain.CreateErrorWithDetailAsync(order, gcts.Token);
         }
         catch (OperationCanceledException ex)
@@ -93,6 +94,7 @@ public class OrderController : ControllerBase
 
             var orderGrain = _clusterClient.GetGrain<IOrderGrain>(key);
 
+            // OrderOrderDetail created, but OrderDetail not created
             await orderGrain.CreateWithDetailAsync(order, gcts.Token);
         }
         catch (OperationCanceledException ex)
