@@ -35,6 +35,11 @@ public class StockGrain : Grain, IStockGrain
         }
     }
 
+    public Task CreateErrorAsync(StockCreateInput stock, GrainCancellationToken? token = null)
+    {
+        throw new MyTransactionException("Stock test.");
+    }
+
     #endregion
 
 }

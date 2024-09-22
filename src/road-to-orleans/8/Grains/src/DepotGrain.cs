@@ -17,16 +17,30 @@ public class DepotGrain : Grain, IDepotGrain
 
     #region IDepotGrain implementations
 
+    public async Task CreateErrorWithStockAsync(GrainCancellationToken? token = null)
+    {
+        var stockGrain = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
+        await stockGrain.CreateAsync(new StockCreateInput("no state", 0), token);
+
+        throw new MyTransactionException("Depot test.");
+    }
+
+    public async Task CreateNoStateWithStockAsync(GrainCancellationToken? token = null)
+    {
+        var stockGrain = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
+        await stockGrain.CreateAsync(new StockCreateInput("no state", 0), token);
+    }
+
     public async Task CreateWithStockAsync(DepotCreateInput depot, GrainCancellationToken? token = null)
     {
         try
         {
-            // var data = await _depotState.PerformRead((o) => o);
+            var data = await _depotState.PerformRead((o) => o);
 
-            // if (data.Id != 0)
-            // {
-            // return;
-            // }
+            if (data.Id != 0)
+            {
+                return;
+            }
 
             var stockGrain = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
             await stockGrain.CreateAsync(depot.StockCreateInput, token);
@@ -43,6 +57,26 @@ public class DepotGrain : Grain, IDepotGrain
             Console.WriteLine(ex.Message);
             throw;
         }
+    }
+
+    public async Task CreateWithStockErrorAsync(DepotCreateInput depot, GrainCancellationToken? token = null)
+    {
+        var data = await _depotState.PerformRead((o) => o);
+
+        if (data.Id != 0)
+        {
+            return;
+        }
+
+        var stockGrain = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
+        await stockGrain.CreateErrorAsync(depot.StockCreateInput, token);
+
+        await _depotState.PerformUpdate((o) =>
+        {
+            o.Id = this.GetPrimaryKeyLong();
+            o.Name = depot.Name;
+            o.CreationTime = depot.CreationTime;
+        });
     }
 
     #endregion
