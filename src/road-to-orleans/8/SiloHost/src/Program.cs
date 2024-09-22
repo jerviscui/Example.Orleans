@@ -1,5 +1,4 @@
 using Azure.Data.Tables;
-using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,6 @@ using OpenTelemetry.Trace;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.Serialization;
 using StackExchange.Redis;
 using System;
 using System.Globalization;
@@ -76,8 +74,8 @@ internal static class Program
         var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
-        var clusterId = "dev7";
-        var serviceId = "road7";
+        var clusterId = "dev8";
+        var serviceId = "road8";
 
         var domain = "host.docker.internal";
         var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=6,allowAdmin=true");
@@ -117,16 +115,6 @@ internal static class Program
                     storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
                 });
 
-                _ = siloBuilder.Services
-                    .AddSerializer((serializerBuilder) =>
-                    {
-                        _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
-                    })
-                    .AddSerializer((serializerBuilder) =>
-                    {
-                        _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
-                    });
-
                 _ = siloBuilder.UseTransactions();
                 _ = siloBuilder.AddAzureTableTransactionalStateStorage(
                     "AzureTable",
@@ -138,7 +126,7 @@ internal static class Program
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()
                 .ConfigureResource((builder) =>
-                    builder.AddService("road7", clusterId, "1.0.0", serviceInstanceId: instance))
+                    builder.AddService("road8", clusterId, "1.0.0", serviceInstanceId: instance))
                 .WithMetrics(builder =>
                 {
                     _ = builder.AddMeter("Microsoft.Orleans");

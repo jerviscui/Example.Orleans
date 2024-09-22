@@ -1,11 +1,9 @@
 using Api;
-using Interfaces;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Orleans.Configuration;
-using Orleans.Serialization;
 using StackExchange.Redis;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -73,8 +71,8 @@ internal sealed class Program
 
         var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
 
-        var clusterId = "dev7";
-        var serviceId = "road7";
+        var clusterId = "dev8";
+        var serviceId = "road8";
 
         _ = builder.UseOrleansClient(clientBuilder =>
         {
@@ -105,22 +103,12 @@ internal sealed class Program
             });
 
             _ = clientBuilder.AddActivityPropagation();
-
-            _ = clientBuilder.Services
-                .AddSerializer((serializerBuilder) =>
-                {
-                    _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
-                })
-                .AddSerializer((serializerBuilder) =>
-                {
-                    _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
-                });
         });
 
         _ = builder.Services
             .AddOpenTelemetry()
             .ConfigureResource((builder) =>
-                builder.AddService("road7api", clusterId, "1.0.0", serviceInstanceId: instance))
+                builder.AddService("road8api", clusterId, "1.0.0", serviceInstanceId: instance))
             .WithMetrics((builder) =>
             {
                 _ = builder.AddAspNetCoreInstrumentation()

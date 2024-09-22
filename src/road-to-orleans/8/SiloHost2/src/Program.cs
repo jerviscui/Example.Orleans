@@ -74,8 +74,8 @@ internal static class Program
         var instance = Environment.GetEnvironmentVariable(variable: "HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
-        var clusterId = "dev7";
-        var serviceId = "road7";
+        var clusterId = "dev8";
+        var serviceId = "road8";
 
         var domain = "host.docker.internal";
         var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=6,allowAdmin=true");
@@ -131,7 +131,7 @@ internal static class Program
             .ConfigureServices(services =>
                 services.AddOpenTelemetry()
                 .ConfigureResource((builder) =>
-                    builder.AddService("road72", clusterId, "1.0.0", serviceInstanceId: instance))
+                    builder.AddService("road82", clusterId, "1.0.0", serviceInstanceId: instance))
                 .WithMetrics(builder =>
                 {
                     _ = builder.AddMeter("Microsoft.Orleans");
