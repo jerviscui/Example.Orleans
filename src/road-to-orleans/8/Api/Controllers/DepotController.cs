@@ -148,6 +148,40 @@ public class DepotController : ControllerBase
         return Ok($"Depot created: {key}");
     }
 
+    [HttpPost("CreateWithTwoStockError/{id}")]
+    public async Task<IActionResult> CreateWithTwoStockErrorAsync(long id, DepotCreateInput depot,
+        CancellationToken cancellationToken = default)
+    {
+        var key = id;
+
+        try
+        {
+            using var gcts = new GrainCancellationTokenSource();
+            using var registration = gcts.RegisterTo(cancellationToken);
+
+            var depotGrain = _clusterClient.GetGrain<IDepotGrain>(key);
+
+            // Depot not save KeyEntity & StateEntity
+            // Stock not save KeyEntity & StateEntity
+            // todo: test two dependency error
+            await depotGrain.CreateWithTwoStockErrorAsync(depot, gcts.Token);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.GrainCanceled(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.GrainError(ex.Message);
+
+            return BadRequest(ex.Message);
+        }
+
+        return Ok($"Depot created: {key}");
+    }
+
     #endregion
 
 }

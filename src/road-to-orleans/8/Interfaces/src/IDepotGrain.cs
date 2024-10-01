@@ -47,6 +47,16 @@ public interface IDepotGrain : IGrainWithIntegerKey
     [Transaction(TransactionOption.Create)]
     Task CreateWithStockErrorAsync(DepotCreateInput depot, GrainCancellationToken? token = null);
 
+    /// <summary>
+    /// Creates the with two stock error asynchronous.
+    /// </summary>
+    /// <param name="depot">The depot.</param>
+    /// <param name="token">The token.</param>
+    /// <returns></returns>
+    [Transaction(TransactionOption.Create)]
+    [Alias("CreateWithTwoStockErrorAsync")]
+    Task CreateWithTwoStockErrorAsync(DepotCreateInput depot, GrainCancellationToken? token = null);
+
     #endregion
 
 }

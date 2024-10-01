@@ -79,6 +79,29 @@ public class DepotGrain : Grain, IDepotGrain
         });
     }
 
+    public async Task CreateWithTwoStockErrorAsync(DepotCreateInput depot, GrainCancellationToken? token = null)
+    {
+        var data = await _depotState.PerformRead((o) => o);
+
+        if (data.Id != 0)
+        {
+            return;
+        }
+
+        var stockGrain1 = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong());
+        await stockGrain1.CreateAsync(depot.StockCreateInput, token);
+
+        var stockGrain2 = GrainFactory.GetGrain<IStockGrain>(this.GetPrimaryKeyLong() + 1);
+        await stockGrain2.CreateErrorAsync(depot.StockCreateInput, token);
+
+        await _depotState.PerformUpdate((o) =>
+        {
+            o.Id = this.GetPrimaryKeyLong();
+            o.Name = depot.Name;
+            o.CreationTime = depot.CreationTime;
+        });
+    }
+
     #endregion
 
 }
