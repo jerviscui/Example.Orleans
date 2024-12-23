@@ -1,4 +1,3 @@
-using Api;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -8,6 +7,8 @@ using StackExchange.Redis;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+
+namespace Api;
 
 internal sealed class Program
 {
@@ -42,7 +43,8 @@ internal sealed class Program
     private static bool IsDevelopment()
     {
         return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-            ?.Equals(Environments.Development, StringComparison.OrdinalIgnoreCase) ?? false;
+            ?.Equals(Environments.Development, StringComparison.OrdinalIgnoreCase)
+               ?? false;
     }
 
     private static async Task Main(string[] args)
@@ -74,73 +76,82 @@ internal sealed class Program
         var clusterId = "dev8";
         var serviceId = "road8";
 
-        _ = builder.UseOrleansClient(clientBuilder =>
-        {
-            _ = clientBuilder.UseRedisClustering(options =>
+        _ = builder.UseOrleansClient(
+            clientBuilder =>
             {
-                options.ConfigurationOptions = redisConfig;
+                _ = clientBuilder.UseRedisClustering(
+                    options =>
+                    {
+                        options.ConfigurationOptions = redisConfig;
+                    });
+                _ = clientBuilder.Configure<ClusterOptions>(
+                    options =>
+                    {
+                        options.ClusterId = clusterId;
+                        options.ServiceId = serviceId;
+                    });
+
+                _ = clientBuilder.UseConnectionRetryFilter(
+                    async (exception, token) =>
+                    {
+                        logger.ConnectionFailed();
+
+                        try
+                        {
+                            await Task.Delay(5_000, token);
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    });
+
+                _ = clientBuilder.AddActivityPropagation();
             });
-            _ = clientBuilder.Configure<ClusterOptions>(options =>
-            {
-                options.ClusterId = clusterId;
-                options.ServiceId = serviceId;
-            });
-
-            _ = clientBuilder.UseConnectionRetryFilter(async (exception, token) =>
-            {
-                logger.ConnectionFailed();
-
-                try
-                {
-                    await Task.Delay(5_000, token);
-                }
-                catch (TaskCanceledException)
-                {
-                    return false;
-                }
-
-                return true;
-            });
-
-            _ = clientBuilder.AddActivityPropagation();
-        });
 
         _ = builder.Services
             .AddOpenTelemetry()
-            .ConfigureResource((builder) =>
-                builder.AddService("road8api", clusterId, "1.0.0", serviceInstanceId: instance))
-            .WithMetrics((builder) =>
-            {
-                _ = builder.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation()
-                    .AddProcessInstrumentation();
-
-                // _ = builder.SetExemplarFilter(ExemplarFilterType.TraceBased);
-
-                _ = builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
+            .ConfigureResource(
+                (builder) => builder.AddService("road8api", clusterId, "1.0.0", serviceInstanceId: instance))
+            .WithMetrics(
+                (builder) =>
                 {
-                    exporterOptions.Endpoint = new Uri($"http://{domain}:9090/api/v1/otlp/v1/metrics");
-                    exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000; // default 60s
-                    // metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
-                });
-            })
-            .WithTracing(providerBuilder =>
-            {
-                _ = providerBuilder.SetSampler(new AlwaysOnSampler());
+                    _ = builder.AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .AddRuntimeInstrumentation()
+                        .AddProcessInstrumentation();
 
-                _ = providerBuilder.AddAspNetCoreInstrumentation();
-                // orleans
-                _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime").AddSource("Microsoft.Orleans.Application");
+                    // _ = builder.SetExemplarFilter(ExemplarFilterType.TraceBased);
 
-                // grpc
-                _ = providerBuilder.AddOtlpExporter(options =>
+                    _ = builder.AddOtlpExporter(
+                        (exporterOptions, metricReaderOptions) =>
+                        {
+                            exporterOptions.Endpoint = new Uri($"http://{domain}:9090/api/v1/otlp/v1/metrics");
+                            exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000; // default 60s
+                            // metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
+                        });
+                })
+            .WithTracing(
+                providerBuilder =>
                 {
-                    options.Protocol = OtlpExportProtocol.Grpc;
-                    options.Endpoint = new Uri($"http://{domain}:4317");
+                    _ = providerBuilder.SetSampler(new AlwaysOnSampler());
+
+                    _ = providerBuilder.AddAspNetCoreInstrumentation();
+                    // orleans
+                    _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime")
+                        .AddSource("Microsoft.Orleans.Application");
+
+                    // grpc
+                    _ = providerBuilder.AddOtlpExporter(
+                        options =>
+                        {
+                            options.Protocol = OtlpExportProtocol.Grpc;
+                            options.Endpoint = new Uri($"http://{domain}:4317");
+                        });
                 });
-            });
 
         var app = builder.Build();
 
