@@ -113,13 +113,6 @@ internal static class Program
 
                     _ = siloBuilder.AddActivityPropagation();
 
-                    _ = siloBuilder.AddAdoNetGrainStorageAsDefault(
-                        (storageOptions) =>
-                        {
-                            storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
-                            storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
-                        });
-
 #pragma warning disable ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                     _ = siloBuilder.AddActivationRepartitioner();
 #pragma warning restore ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

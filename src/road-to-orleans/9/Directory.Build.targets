@@ -9,4 +9,8 @@
     <None Include="_Generated\**\*.g.cs" />
   </ItemGroup>
 
+  <Target Name="CleanGenerated" AfterTargets="Clean">
+    <RemoveDir Directories="$(ProjectDir)_Generated" />
+  </Target>
+
 </Project>
