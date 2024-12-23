@@ -872,7 +872,7 @@ dotnet_diagnostic.S3400.severity = error
 dotnet_diagnostic.S3459.severity = error
 
 # S3903: Types should be defined in named namespaces
-# dotnet_diagnostic.S3903.severity = none
+dotnet_diagnostic.S3903.severity = error
 
 # S3923: All branches in a conditional structure should not have exactly the same implementation
 dotnet_diagnostic.S3923.severity = error

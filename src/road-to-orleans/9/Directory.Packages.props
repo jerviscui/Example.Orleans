@@ -1,0 +1,30 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="MessagePack.Annotations" Version="2.5.172" />
+    <PackageVersion Include="MessagePackAnalyzer" Version="2.5.172" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Orleans.Client" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Clustering.Redis" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.GrainDirectory.Redis" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Persistence.AdoNet" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Runtime" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Sdk" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Serialization.MessagePack" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Serialization.SystemTextJson" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Server" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Transactions.AzureStorage" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Orleans.Transactions" Version="8.2.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Process" Version="0.5.0-beta.7" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
+    <PackageVersion Include="OrleansDashboard" Version="8.2.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.8.0" />
+  </ItemGroup>
+</Project>

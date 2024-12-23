@@ -1,10 +1,8 @@
-using Interfaces;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Orleans.Configuration;
-using Orleans.Serialization;
 using StackExchange.Redis;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -45,7 +43,7 @@ internal sealed class Program
     private static bool IsDevelopment()
     {
         return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-        ?.Equals(Environments.Development, StringComparison.OrdinalIgnoreCase)
+            ?.Equals(Environments.Development, StringComparison.OrdinalIgnoreCase)
                ?? false;
     }
 
@@ -75,8 +73,8 @@ internal sealed class Program
 
         var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
 
-        var clusterId = "dev7";
-        var serviceId = "road7";
+        var clusterId = "dev9";
+        var serviceId = "road9";
 
         _ = builder.UseOrleansClient(
             clientBuilder =>
@@ -111,24 +109,12 @@ internal sealed class Program
                     });
 
                 _ = clientBuilder.AddActivityPropagation();
-
-                _ = clientBuilder.Services
-                    .AddSerializer(
-                        (serializerBuilder) =>
-                        {
-                            _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
-                        })
-                    .AddSerializer(
-                        (serializerBuilder) =>
-                        {
-                            _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
-                        });
             });
 
         _ = builder.Services
             .AddOpenTelemetry()
             .ConfigureResource(
-                (builder) => builder.AddService("road7api", clusterId, "1.0.0", serviceInstanceId: instance))
+                (builder) => builder.AddService("road9api", clusterId, "1.0.0", serviceInstanceId: instance))
             .WithMetrics(
                 (builder) =>
                 {
