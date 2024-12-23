@@ -109,6 +109,8 @@ internal sealed class Program
                     });
 
                 _ = clientBuilder.AddActivityPropagation();
+
+                _ = clientBuilder.AddOutgoingGrainCallFilter<UserOutgoingCallFilter>();
             });
 
         _ = builder.Services

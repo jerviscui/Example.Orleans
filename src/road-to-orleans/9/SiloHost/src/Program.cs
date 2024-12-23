@@ -116,6 +116,17 @@ internal static class Program
 #pragma warning disable ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                     _ = siloBuilder.AddActivationRepartitioner();
 #pragma warning restore ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+                    _ = siloBuilder.AddIncomingGrainCallFilter(
+                        async (context) =>
+                        {
+                            Console.WriteLine($"SourceId: {context.SourceId}\tTargetId: {context.TargetId}");
+                            Console.WriteLine($"{context.Grain}");
+
+                            await context.Invoke();
+
+                            Console.WriteLine($"Result: {context.Result}");
+                        });
                 })
             .ConfigureServices(
                 services =>
