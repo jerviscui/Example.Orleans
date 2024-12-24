@@ -17,7 +17,7 @@ public class OrderGrain : Grain, IOrderGrain
     {
         await Task.Delay(100);
 
-        Console.WriteLine(User.GetName());
+        Console.WriteLine($"User.Name: {User.GetName()}");
     }
 
     #endregion

@@ -120,12 +120,23 @@ internal static class Program
                     _ = siloBuilder.AddIncomingGrainCallFilter(
                         async (context) =>
                         {
-                            Console.WriteLine($"SourceId: {context.SourceId}\tTargetId: {context.TargetId}");
-                            Console.WriteLine($"{context.Grain}");
+                            // Interfaces.IOrderGrain
+                            if (context.InterfaceType.ToString()?.StartsWith(
+                                "Interfaces.",
+                                StringComparison.InvariantCultureIgnoreCase)
+                                ?? false)
+                            {
+                                Console.WriteLine($"SourceId: {context.SourceId}\tTargetId: {context.TargetId}");
+                                Console.WriteLine($"{context.Grain}");
 
-                            await context.Invoke();
+                                await context.Invoke();
 
-                            Console.WriteLine($"Result: {context.Result}");
+                                Console.WriteLine($"Result: {context.Result}");
+                            }
+                            else
+                            {
+                                await context.Invoke();
+                            }
                         });
                 })
             .ConfigureServices(
