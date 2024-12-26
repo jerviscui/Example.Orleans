@@ -5,11 +5,22 @@ using System.Threading.Tasks;
 
 namespace Grains;
 
-public class OrderGrain : Grain, IOrderGrain
+public class OrderGrain : Grain, IOrderGrain, IIncomingGrainCallFilter
 {
     public OrderGrain()
     {
     }
+
+    #region IIncomingGrainCallFilter implementations
+
+    public async Task Invoke(IIncomingGrainCallContext context)
+    {
+        Console.WriteLine($"{context.MethodName} before calling");
+        await context.Invoke();
+        Console.WriteLine($"{context.MethodName} after called");
+    }
+
+    #endregion
 
     #region IOrderGrain implementations
 

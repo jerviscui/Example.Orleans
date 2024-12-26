@@ -1,3 +1,4 @@
+using Grains;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -138,6 +139,8 @@ internal static class Program
                                 await context.Invoke();
                             }
                         });
+
+                    _ = siloBuilder.AddGrainExtension<IWatchGrainExtension, WatchGrainExtension>();
                 })
             .ConfigureServices(
                 services =>
