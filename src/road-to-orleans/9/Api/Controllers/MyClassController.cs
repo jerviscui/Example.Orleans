@@ -18,36 +18,6 @@ public class MyClassController : ControllerBase
 
     #region Methods
 
-    [HttpPost("Method1")]
-    public async Task<IActionResult> Method1Async(CancellationToken cancellationToken = default)
-    {
-        var key = 0;
-
-        try
-        {
-            using var gcts = new GrainCancellationTokenSource();
-            using var registration = gcts.RegisterTo(cancellationToken);
-
-            var myClassGrain = _clusterClient.GetGrain<IMyClassGrain>(key);
-
-            await myClassGrain.Method1Async(gcts.Token);
-        }
-        catch (OperationCanceledException ex)
-        {
-            _logger.GrainCanceled(ex.Message);
-
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.GrainError(ex.Message);
-
-            return BadRequest(ex.Message);
-        }
-
-        return Ok($"Method1Async ok");
-    }
-
     [HttpPost("Method2")]
     public async Task<IActionResult> Method2Async(CancellationToken cancellationToken = default)
     {

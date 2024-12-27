@@ -12,12 +12,6 @@ public class MyClassGrain : Grain, IMyClassGrain
 
     #region IMyClassGrain implementations
 
-    public async Task Method1Async(GrainCancellationToken? token = null)
-    {
-        var extension = this.AsReference<IWatchGrainExtension>();
-        await extension.WatchAsync(token.GetCancellationToken());
-    }
-
     public async Task Method2Async(GrainCancellationToken? token = null)
     {
         var extension = GrainContext.GetGrainExtension<IWatchGrainExtension>();
