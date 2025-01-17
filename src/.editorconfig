@@ -793,6 +793,9 @@ dotnet_diagnostic.S2275.severity = suggestion
 # S2292: Trivial properties should be auto-implemented
 dotnet_diagnostic.S2292.severity = none
 
+# S2292: Trivial properties should be auto-implemented
+dotnet_diagnostic.S2325.severity = none
+
 # S2933: Fields that are only assigned in the constructor should be "readonly"
 dotnet_diagnostic.S2933.severity = none
 
@@ -896,6 +899,9 @@ resharper_indent_nested_usings_stmt = true
 resharper_indent_nested_while_stmt = true
 resharper_indent_raw_literal_string = do_not_change
 resharper_outdent_statement_labels = true
+
+[*{Test,Tests}.cs]
+dotnet_diagnostic.CA1707.severity = suggestion
 
 [**/_Generated/**.cs]
 generated_code = true
