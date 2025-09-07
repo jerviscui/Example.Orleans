@@ -122,6 +122,11 @@ internal sealed class Program
                         (serializerBuilder) =>
                         {
                             _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
+                        })
+                    .AddSerializer(
+                        (serializerBuilder) =>
+                        {
+                            _ = serializerBuilder.AddMemoryPackSerializer();
                         });
             });
 

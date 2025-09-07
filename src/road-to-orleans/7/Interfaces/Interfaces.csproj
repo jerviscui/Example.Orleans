@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MemoryPack" />
     <PackageReference Include="MessagePack.Annotations" />
     <PackageReference Include="MessagePackAnalyzer">
       <PrivateAssets>all</PrivateAssets>

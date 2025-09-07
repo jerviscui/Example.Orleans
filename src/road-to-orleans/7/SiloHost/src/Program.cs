@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace SiloHost;
 
-internal static class Program
+public static class Program
 {
 
     #region Constants & Statics
@@ -49,13 +49,14 @@ internal static class Program
                 .First();
         }
 
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public static bool IsDevelopment()
     {
         return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-            ?.Equals(Environments.Development, StringComparison.OrdinalIgnoreCase) ?? false;
+            ?.Equals(Environments.Development, StringComparison.OrdinalIgnoreCase)
+               ?? false;
     }
 
     public static async Task Main()
@@ -75,8 +76,8 @@ internal static class Program
         var instance = Environment.GetEnvironmentVariable("HOSTNAME") ?? GetLocalIpAddress().ToString();
         instance += $":{extractedSiloPort}";
 
-        var clusterId = "dev7";
-        var serviceId = "road7";
+        const string clusterId = "dev7";
+        const string serviceId = "road7";
 
         var domain = "host.docker.internal";
         var redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=6,allowAdmin=true");
@@ -86,81 +87,96 @@ internal static class Program
             redisConfig = ConfigurationOptions.Parse($"{domain}:6379,DefaultDatabase=7,allowAdmin=true");
         }
 
-        var host = new HostBuilder()
-            .UseOrleans(siloBuilder =>
+        var host = new HostBuilder().UseOrleans(
+            siloBuilder =>
             {
                 _ = siloBuilder.UseDashboard(dashboardOptions => dashboardOptions.CounterUpdateIntervalMs = 10_000);
 
                 _ = siloBuilder.UseRedisClustering(options => options.ConfigurationOptions = redisConfig);
-                _ = siloBuilder.Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = clusterId;
-                    options.ServiceId = serviceId;
-                });
-                _ = siloBuilder.Configure<EndpointOptions>(endpointOptions =>
-                {
-                    endpointOptions.AdvertisedIPAddress = advertisedIpAddress;
-                    endpointOptions.SiloPort = siloPort;
-                    endpointOptions.GatewayPort = gatewayPort;
-                    endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, siloPort);
-                    endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
-                });
+                _ = siloBuilder.Configure<ClusterOptions>(
+                    options =>
+                    {
+                        options.ClusterId = clusterId;
+                        options.ServiceId = serviceId;
+                    });
+                _ = siloBuilder.Configure<EndpointOptions>(
+                    endpointOptions =>
+                    {
+                        endpointOptions.AdvertisedIPAddress = advertisedIpAddress;
+                        endpointOptions.SiloPort = siloPort;
+                        endpointOptions.GatewayPort = gatewayPort;
+                        endpointOptions.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, siloPort);
+                        endpointOptions.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, gatewayPort);
+                    });
 
                 _ = siloBuilder.UseRedisGrainDirectoryAsDefault(options => options.ConfigurationOptions = redisConfig);
 
                 _ = siloBuilder.AddActivityPropagation();
 
-                _ = siloBuilder.AddAdoNetGrainStorageAsDefault((storageOptions) =>
-                {
-                    storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
-                    storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
-                });
+                _ = siloBuilder.AddAdoNetGrainStorageAsDefault(
+                    (storageOptions) =>
+                    {
+                        storageOptions.Invariant = "Npgsql"; // Orleans.Persistence.AdoNet.Storage.AdoNetInvariants.InvariantNamePostgreSql
+                        storageOptions.ConnectionString = $"Host={domain};Port=5432;Database=orleans;Username=postgres;Password=123456;";
+                    });
 
                 _ = siloBuilder.Services
-                    .AddSerializer((serializerBuilder) =>
-                    {
-                        _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
-                    })
-                    .AddSerializer((serializerBuilder) =>
-                    {
-                        _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
-                    });
+                    .AddSerializer(
+                        (serializerBuilder) =>
+                        {
+                            _ = serializerBuilder.AddJsonSerializer((type) => type == typeof(OrderUpdateInput));
+                        })
+                    .AddSerializer(
+                        (serializerBuilder) =>
+                        {
+                            _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
+                        })
+                    .AddSerializer(
+                        (serializerBuilder) =>
+                        {
+                            _ = serializerBuilder.AddMemoryPackSerializer();
+                        });
 
 #pragma warning disable ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 _ = siloBuilder.AddActivationRepartitioner();
 #pragma warning restore ORLEANSEXP001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             })
-            .ConfigureServices(services =>
-                services.AddOpenTelemetry()
-                .ConfigureResource((builder) =>
-                    builder.AddService("road7", clusterId, "1.0.0", serviceInstanceId: instance))
-                .WithMetrics(builder =>
-                {
-                    _ = builder.AddMeter("Microsoft.Orleans");
+            .ConfigureServices(
+                services =>
+                    services.AddOpenTelemetry()
+                    .ConfigureResource(
+                        (builder) => builder.AddService("road7", clusterId, "1.0.0", serviceInstanceId: instance))
+                    .WithMetrics(
+                        builder =>
+                        {
+                            _ = builder.AddMeter("Microsoft.Orleans");
 
-                    _ = builder.AddOtlpExporter((exporterOptions, metricReaderOptions) =>
-                    {
-                        exporterOptions.Endpoint = new Uri($"http://{domain}:9090/api/v1/otlp/v1/metrics");
-                        exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000; // default 60s
-                        // metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
-                    });
-                })
-                .WithTracing(providerBuilder =>
-                {
-                    _ = providerBuilder.SetSampler(new AlwaysOnSampler());
+                            _ = builder.AddOtlpExporter(
+                                (exporterOptions, metricReaderOptions) =>
+                                {
+                                    exporterOptions.Endpoint = new Uri($"http://{domain}:9090/api/v1/otlp/v1/metrics");
+                                    exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                                    metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5_000; // default 60s
+                                    // metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 30_000;// default 30s
+                                });
+                        })
+                    .WithTracing(
+                        providerBuilder =>
+                        {
+                            _ = providerBuilder.SetSampler(new AlwaysOnSampler());
 
-                    // orleans
-                    _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime")
-                        .AddSource("Microsoft.Orleans.Application");
+                            // orleans
+                            _ = providerBuilder.AddSource("Microsoft.Orleans.Runtime")
+                                .AddSource("Microsoft.Orleans.Application");
 
-                    // grpc
-                    _ = providerBuilder.AddOtlpExporter(options =>
-                    {
-                        options.Protocol = OtlpExportProtocol.Grpc;
-                        options.Endpoint = new Uri($"http://{domain}:4317");
-                    });
-                }))
+                            // grpc
+                            _ = providerBuilder.AddOtlpExporter(
+                                options =>
+                                {
+                                    options.Protocol = OtlpExportProtocol.Grpc;
+                                    options.Endpoint = new Uri($"http://{domain}:4317");
+                                });
+                        }))
             .ConfigureLogging(logging => logging.AddConsole())
             .UseConsoleLifetime()
             .Build();
