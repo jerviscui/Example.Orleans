@@ -15,7 +15,7 @@ public static partial class LoggerExtensions
     public static partial void GrainError(this ILogger logger, string message);
 
     [LoggerMessage(EventId = 1001, Level = LogLevel.Error, Message = "Run error. {err}")]
-    public static partial void RunError(this ILogger logger, string err);
+    public static partial void RunError(this ILogger logger, string err, Exception e);
 
     #endregion
 

@@ -8,3 +8,4 @@ This example builds on top of solution 6.
 4. Call Serialization use GenerateSerializerAttribute, MemoryPack, MessagePack and SystemTextJson
 5. Persistence
 6. activation repartitioning(重分区)
+7. Use CancellationToken

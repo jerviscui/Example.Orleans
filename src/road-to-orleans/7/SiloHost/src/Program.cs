@@ -129,7 +129,8 @@ public static class Program
                     .AddSerializer(
                         (serializerBuilder) =>
                         {
-                            _ = serializerBuilder.AddMessagePackSerializer((type) => type == typeof(OrderDeleteInput));
+                            _ = serializerBuilder.AddMessagePackSerializer(
+                                (type) => type == typeof(OrderDeleteInput) || type == typeof(IntClass2));
                         })
                     .AddSerializer(
                         (serializerBuilder) =>
