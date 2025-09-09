@@ -10,6 +10,7 @@ using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -85,12 +86,11 @@ public sealed class MemoryPackCodec : IGeneralizedCodec, IGeneralizedCopier, ITy
     #region IDeepCopier implementations
 
     /// <inheritdoc/>
-    object? IDeepCopier.DeepCopy(object input, CopyContext context)
+    object? IDeepCopier.DeepCopy(object? input, CopyContext context)
     {
-        var type = input.GetType();
-        if (type.GetCustomAttribute<ImmutableAttribute>() is not null)
+        if (input is null)
         {
-            return input;
+            return null;
         }
 
         if (context.TryGetCopy(input, out object? result))
@@ -98,20 +98,30 @@ public sealed class MemoryPackCodec : IGeneralizedCodec, IGeneralizedCopier, ITy
             return result;
         }
 
-        var bufferWriter = new BufferWriterBox<PooledBuffer>(new());
-        try
+        var type = input.GetType();
+        if (type.GetCustomAttribute<ImmutableAttribute>() is not null)
         {
-            MemoryPackSerializer.Serialize(type, bufferWriter, input, _options.SerializerOptions);
-
-            var sequence = bufferWriter.Value.AsReadOnlySequence();
-            result = MemoryPackSerializer.Deserialize(type, sequence, _options.SerializerOptions);
+            result = input;
         }
-        finally
+        else
         {
-            bufferWriter.Value.Dispose();
+            var bufferWriter = new BufferWriterBox<PooledBuffer>(new());
+            try
+            {
+                MemoryPackSerializer.Serialize(type, bufferWriter, input, _options.SerializerOptions);
+
+                var sequence = bufferWriter.Value.AsReadOnlySequence();
+                result = MemoryPackSerializer.Deserialize(type, sequence, _options.SerializerOptions);
+            }
+            finally
+            {
+                bufferWriter.Value.Dispose();
+            }
         }
 
+        Debug.Assert(result is not null, "result != null");
         context.RecordCopy(input, result);
+
         return result;
     }
 

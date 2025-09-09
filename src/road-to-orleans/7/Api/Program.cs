@@ -5,6 +5,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Orleans.Configuration;
 using Orleans.Serialization;
+using Scalar.AspNetCore;
 using StackExchange.Redis;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -57,8 +58,7 @@ internal sealed class Program
         var builder = WebApplication.CreateBuilder(args);
 
         _ = builder.Services.AddControllers();
-        _ = builder.Services.AddEndpointsApiExplorer();
-        _ = builder.Services.AddSwaggerGen();
+        _ = builder.Services.AddOpenApi();
 
         _ = builder.Logging.AddJsonConsole();
 
@@ -181,8 +181,8 @@ internal sealed class Program
             // app.UseHsts();
         }
 
-        _ = app.UseSwagger();
-        _ = app.UseSwaggerUI();
+        _ = app.MapOpenApi();
+        _ = app.MapScalarApiReference();
 
         // app.UseHttpsRedirection();
 
