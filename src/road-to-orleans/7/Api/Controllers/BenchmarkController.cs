@@ -33,11 +33,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = Enumerable.Repeat(IntClass1.Create(), 100).ToArray();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = Enumerable.Repeat(IntClass1.Create(), 1000).ToArray();
                 _ = await orderGrain.Benchmark1ArrayAsync(order, cancellationToken);
             }
         }
@@ -69,11 +69,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = IntClass1.Create();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = IntClass1.Create();
                 _ = await orderGrain.Benchmark1Async(order, cancellationToken);
             }
         }
@@ -105,11 +105,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = Enumerable.Repeat(IntClass2.Create(), 100).ToArray();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = Enumerable.Repeat(IntClass2.Create(), 1000).ToArray();
                 _ = await orderGrain.Benchmark2ArrayAsync(order, cancellationToken);
             }
         }
@@ -141,11 +141,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = IntClass2.Create();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = IntClass2.Create();
                 _ = await orderGrain.Benchmark2Async(order, cancellationToken);
             }
         }
@@ -177,11 +177,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = Enumerable.Repeat(IntClass3.Create(), 100).ToArray();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = Enumerable.Repeat(IntClass3.Create(), 1000).ToArray();
                 _ = await orderGrain.Benchmark3ArrayAsync(order, cancellationToken);
             }
         }
@@ -213,11 +213,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = IntClass3.Create();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = IntClass3.Create();
                 _ = await orderGrain.Benchmark3Async(order, cancellationToken);
             }
         }
@@ -238,13 +238,8 @@ public class BenchmarkController : ControllerBase
     }
 
     [HttpPost("BenchmarkNoGrain/{id}")]
-    public async Task<IActionResult> BenchmarkNoGrainAsync(
-        long id,
-        int count = 1,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> BenchmarkNoGrainAsync(long id, int count = 1)
     {
-        var key = id;
-
         var start = Stopwatch.GetTimestamp();
 
         try
@@ -294,11 +289,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = Enumerable.Repeat(IntStruct1.Create(), 100).ToArray();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = Enumerable.Repeat(IntStruct1.Create(), 1000).ToArray();
                 _ = await orderGrain.BenchmarkStruct1ArrayAsync(order, cancellationToken);
             }
         }
@@ -330,11 +325,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = IntStruct1.Create();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = IntStruct1.Create();
                 _ = await orderGrain.BenchmarkStruct1Async(order, cancellationToken);
             }
         }
@@ -366,11 +361,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = Enumerable.Repeat(IntStruct2.Create(), 100).ToArray();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = Enumerable.Repeat(IntStruct2.Create(), 1000).ToArray();
                 _ = await orderGrain.BenchmarkStruct2ArrayAsync(order, cancellationToken);
             }
         }
@@ -402,11 +397,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = IntStruct2.Create();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = IntStruct2.Create();
                 _ = await orderGrain.BenchmarkStruct2Async(order, cancellationToken);
             }
         }
@@ -438,11 +433,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = Enumerable.Repeat(IntStruct3.Create(), 100).ToArray();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = Enumerable.Repeat(IntStruct3.Create(), 1000).ToArray();
                 _ = await orderGrain.BenchmarkStruct3ArrayAsync(order, cancellationToken);
             }
         }
@@ -474,11 +469,11 @@ public class BenchmarkController : ControllerBase
 
         try
         {
-            var order = IntStruct3.Create();
             var orderGrain = _clusterClient.GetGrain<IBenchmarkGrain>(key);
 
             for (var i = 0; i < count; i++)
             {
+                var order = IntStruct3.Create();
                 _ = await orderGrain.BenchmarkStruct3Async(order, cancellationToken);
             }
         }
